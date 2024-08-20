@@ -1,0 +1,11 @@
+.vscode
+.idea
+.vscodecounter
+.history
+__pycache__
+node_modules
+dist
+logs
+
+*.log*
+*.local
