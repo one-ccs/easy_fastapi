@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.orm import Session
 
-from app.exceptions import TODOException, FailureException
-from app.utils import Result
+from app.core import TODOException, FailureException, Result
 from app import models, schemas
 
 
@@ -28,16 +27,5 @@ async def delete():
     raise TODOException()
 
 
-async def get_users():
+async def get_page():
     return Result.success()
-
-async def login():
-    return Result.success('登录成功')
-
-
-async def logout():
-    raise TODOException()
-
-
-async def register():
-    raise TODOException()

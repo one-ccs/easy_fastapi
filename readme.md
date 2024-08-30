@@ -1,6 +1,6 @@
 # Easy FastAPI
 
-基于 FastAPI 开发的后端框架，集成 SQLAlchemy、Pydantic、Alembic 等插件。
+基于 FastAPI 开发的后端框架，集成 SQLAlchemy、Pydantic、Alembic、PyJWT 等插件。
 
 ## 一、目录结构说明
 
@@ -156,19 +156,35 @@ def run_migrations_online() -> None:
             context.run_migrations()
 ```
 
-#### 4）生成迁移文件
+### 2、迁移
+
+#### 1）生成迁移文件
 
 使用命令 `alembic revision --autogenerate -m "message"` 可以将当前模型中的状态生成迁移文件。
 
-#### 5）更新数据库
+#### 2）更新数据库
 
 使用 `alembic upgrade head` 将刚刚生成的迁移文件，真正映射到数据库中。同理，如果要降级，那么使用 `alembic downgrade head` 。
 
-#### 6）重复
+#### 3）重复
 
 如果以后修改了代码，则重复4~5的步骤。
 
-### 2、命令和参数解释：
+### 3、回退迁移
+
+#### 1）回退到指定版本
+
+使用命令 `alembic downgrade <version>` 回退到指定版本。
+
+#### 2）回退到上一个版本
+
+使用命令 `alembic downgrade -1` 回退到上一个版本。
+
+#### 3）回退到初始版本
+
+使用命令 `alembic downgrade base` 回退到初始版本。
+
+### 4、命令和参数解释：
 
 - init：创建一个 `alembic` 仓库。
 - revision：创建一个新的版本文件。
@@ -183,7 +199,7 @@ def run_migrations_online() -> None:
 
 另外，在你第一次执行 `upgrade` 的时候，就会在数据库中创建一个名叫 `alembic_version` 表，这个表只会有一条数据，记录当前数据库映射的是哪个版本的迁移文件
 
-### QA
+### 5、常见问题
 
 #### 1、编码错误
 

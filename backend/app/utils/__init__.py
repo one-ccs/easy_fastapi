@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from .result import Result
 from .datetime_util import DateTimeUtil
+from .object_util import ObjectUtil
 from .path_util import PathUtil
+from .string_util import StringUtil
 
-__all__ = ['Result', 'DateTimeUtil', 'PathUtil']
+
+__all__ = ['DateTimeUtil', 'ObjectUtil', 'PathUtil', 'StringUtil']

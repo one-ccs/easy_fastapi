@@ -26,6 +26,13 @@ class Result(object):
     # 为 True 返回真实的状态码，为 False 全部返回 200
     is_real_code = False
 
+
+    def __new__(cls, value: bool, success_message='请求成功', failure_message='请求失败') -> JSONResponse:
+        if value:
+            return cls.success(success_message)
+        else:
+            return cls.failure(failure_message)
+
     @json_encoder
     @staticmethod
     def success(message='请求成功', data=None, code=200, schemas=None):

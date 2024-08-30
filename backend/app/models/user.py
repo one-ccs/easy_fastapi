@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from dataclasses import dataclass
+
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
 from app.utils import DateTimeUtil
-from .db import Base
+from .db import Base, ToolClass
 
 
-class User(Base):
-    __tablename__ = 'users'
+@dataclass
+class User(Base, ToolClass):
+    __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True)
     email = Column(String(64), unique=True, index=True)
     username = Column(String(32), unique=True, index=True)
-    password = Column(String(255))
+    hashed_password = Column(String(60))
+    token = Column(String(255))
+    avatar_url = Column(String(255))
+    is_active = Column(Integer, default=1)
     created_at = Column(DateTime, default=DateTimeUtil.now())
 
-    roles = relationship('Role', back_populates='owner')
+    role = relationship('Role', back_populates='owner')

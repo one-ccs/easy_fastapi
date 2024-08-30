@@ -11,17 +11,29 @@ class UserBase(BaseModel):
     email: str
     username: str
 
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-    roles: list[Role] = []
-
     class Config:
         from_attributes = True
         json_encoders = {
             datetime: lambda v: DateTimeUtil.strftime(v)
         }
+
+
+class UserCreate(UserBase):
+    email: str | None = None
+    username: str | None = None
+    password: str
+
+
+class UserInDB(UserBase):
+    id: int
+    hashed_password: str
+    token: str
+    avatar_url: str
+    is_active: bool
+    created_at: datetime
+
+
+class User(UserBase):
+    id: int
+    roles: list[Role] = []
+    is_active: bool

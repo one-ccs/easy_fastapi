@@ -19,3 +19,16 @@ class Setting(object):
     STATIC_FOLDER   = PathUtil.getProjectRoot(ROOT_NAME, 'frontend/dist/static')
     # 允许的图片上传格式
     ALLOWED_IMAGE_EXTENSIONS = set(['jpg', 'png', 'webp', 'gif'])
+
+
+class AuthorizationSetting(object):
+    # 加密密钥
+    SECRET_KEY = MAIN_KEY
+    # JWT加密算法
+    ALGORITHM = 'HS256'
+    # 过期时间
+    ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
+    # 刷新时间
+    REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+    # 登录失败最大次数
+    MAX_LOGIN_FAILURES = 5
