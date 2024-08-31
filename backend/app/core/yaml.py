@@ -20,18 +20,18 @@ def dump_yaml(data: dict) -> str:
 
 def read_yaml(yaml_file: str) -> dict:
     """读取 yaml 文件"""
-    with open(yaml_file, 'r', encoding='utf-8') as f:
+    with open(yaml_file, 'r', encoding=ENCODING) as f:
         data = yaml.safe_load(f)
     return data
 
 
 def write_yaml(data, yaml_file: str):
     """写入 yaml 文件"""
-    with open(yaml_file, 'w', encoding='utf-8') as f:
+    with open(yaml_file, 'w', encoding=ENCODING) as f:
         yaml.safe_dump(data, f)
 
 
-def read_config(project_dir: str, config_file: str='config.yaml') -> dict:
+def read_yaml_config(project_dir: str, config_file: str) -> dict:
     """读取程序配置文件，并替换内置变量
 
     Args:
@@ -41,7 +41,7 @@ def read_config(project_dir: str, config_file: str='config.yaml') -> dict:
     Returns:
         dict: 配置字典
     """
-    with open(f'{project_dir}/{config_file}', 'r', encoding='utf-8') as f:
+    with open(f'{project_dir}/{config_file}', 'r', encoding=ENCODING) as f:
         config = f.read()
     config = config.replace('${PROJECT_DIR}', project_dir)
     config = config.replace('${DATE}', datetime.now(timezone.utc).strftime(r'%Y-%m-%d'))

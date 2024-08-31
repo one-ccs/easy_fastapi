@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from typing import TypeVar
-from datetime import timedelta, datetime, timezone
 
-import jwt
 import bcrypt
+import jwt
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from app.core import UnauthorizedException, ForbiddenException, config
+from . import config
+from .redis import redis_conn
+from .exceptions import ForbiddenException, FailureException
+from app.utils import DateTimeUtil
+from app import schemas
 
+
+T = TypeVar('T')
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='api/login')
-T = TypeVar('T')
 
 
 def encrypt_password(password: str) -> str:
@@ -26,7 +30,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def create_access_token(data: dict):
-    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    """创建访问令牌"""
+    expire = DateTimeUtil.now() + config.ACCESS_TOKEN_EXPIRE_MINUTES
     to_encode = data.copy()
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
@@ -34,7 +39,8 @@ def create_access_token(data: dict):
 
 
 def create_refresh_token(data: dict):
-    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=config.REFRESH_TOKEN_EXPIRE_MINUTES)
+    """创建刷新令牌"""
+    expire = DateTimeUtil.now() + config.REFRESH_TOKEN_EXPIRE_MINUTES
     to_encode = data.copy()
     to_encode.update({'exp': expire, 'refresh_token': True})
     encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
@@ -42,20 +48,54 @@ def create_refresh_token(data: dict):
 
 
 def decode_token(token: str) -> dict:
-    try:
-        payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise UnauthorizedException('访问令牌已过期')
-    except jwt.InvalidTokenError:
-        raise UnauthorizedException('无效的访问令牌')
+    """解析令牌为字典，若令牌无效将引发错误"""
+    if redis_conn.get(token):
+        raise ForbiddenException('令牌已销毁')
+
+    return jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
-    return decode_token(token)
+def revoke_token(token: str) -> bool:
+    """将令牌放入黑名单"""
+    redis_conn.set(token, 1, ex=config.ACCESS_TOKEN_EXPIRE_MINUTES)
 
 
-async def get_current_active_user(current_user: dict = Depends(get_current_user)) -> dict:
-    if not current_user.get('is_active', True):
+def is_refresh_token(token: str) -> bool:
+    """判断是否是刷新令牌"""
+    payload = decode_token(token)
+
+    return payload.get('refresh_token', False)
+
+
+async def require_token(token: str = Depends(oauth2_scheme)) -> str:
+    """返回令牌"""
+    return token
+
+
+async def require_refresh_token(token: str = Depends(require_token)) -> str:
+    """返回刷新令牌"""
+    if not is_refresh_token(token):
+        raise FailureException('非刷新令牌')
+    return token
+
+
+async def get_current_user(token: str = Depends(require_token)) -> schemas.UserInToken:
+    """获取 jwt 保存的用户信息"""
+    payload = decode_token(token)
+    current_user = schemas.UserInToken(**payload)
+
+    if not current_user.is_active:
         raise ForbiddenException('账户已被禁用')
+
+    return current_user
+
+
+async def get_current_of_refresh(token: str = Depends(require_refresh_token)) -> schemas.UserInToken:
+    """获取 jwt 保存的用户信息，并校验是否是刷新令牌"""
+    payload = decode_token(token)
+    current_user = schemas.UserInToken(**payload)
+
+    if not current_user.is_active:
+        raise ForbiddenException('账户已被禁用')
+
     return current_user

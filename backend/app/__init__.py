@@ -6,6 +6,8 @@ from .main import app
 __all__ = ['app']
 
 
+# 初始化配置文件
+from app.core import config
 # 导入错误处理模块
 from app.core import exception_handler
 # 最后导入路由

@@ -1,27 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordRequestForm
 
-from app.core import get_current_active_user
 from app.services import authorization_service
-from app import schemas, models
+from app import core, schemas, models
 
 
 authorization_router = APIRouter()
 
 
 @authorization_router.post('/login', summary='登录', description='用户登录接口')
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(models.get_db)):
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(core.get_db),
+):
     return await authorization_service.login(form_data, db)
 
 
+@authorization_router.post('/refresh', summary='刷新令牌', description='刷新令牌接口')
+async def refresh(
+    current_user: schemas.UserInToken = Depends(core.get_current_of_refresh)
+):
+    return await authorization_service.refresh(current_user)
+
+
 @authorization_router.post('/register', summary='注册', description='用户注册接口')
-async def register(user: schemas.UserCreate, db: Session = Depends(models.get_db)):
-    return await authorization_service.register(user, db)
+async def register(form_data: schemas.UserCreate, db: Session = Depends(core.get_db)):
+    return await authorization_service.register(form_data, db)
 
 
 @authorization_router.post('/logout', summary='登出', description='用户登出接口')
-async def logout(current_user: dict = Depends(get_current_active_user)):
-    return await authorization_service.logout(current_user)
+async def logout(token: str = Depends(core.require_refresh_token)):
+    return await authorization_service.logout(token)

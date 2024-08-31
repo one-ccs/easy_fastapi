@@ -3,8 +3,13 @@ easy_fastapi:
         url: mysql://127.0.0.1:3306/easy_fastapi
         username: root
         password: 123456
+    redis:
+        host: 127.0.0.1
+        port: 6379
+        db: 0
     authorization:
         secret_key: easy_fastapi
+        algorithm: HS256
         access_token_expire_minutes: 30
         refresh_token_expire_days: 10080
     resources:

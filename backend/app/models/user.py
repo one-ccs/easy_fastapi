@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
+from app.core import Base, ToolClass
 from app.utils import DateTimeUtil
-from .db import Base, ToolClass
 
 
 @dataclass

@@ -3,19 +3,19 @@
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
+from .db import Base, ToolClass
+
 
 def json_encoder(func):
+    """对不可 json 序列化的参数进行处理"""
     def wrapper(*args, **kw):
         # 将 model 转为字典，若有 schema 则再转换一次
-        if 'data' in kw:
-            from app import models
-
-            data = kw['data']
-            if isinstance(data, models.Base):
-                if 'schemas' in kw:
-                    data = kw['schemas'](**vars(data))
+        if data := kw.get('data', None):
+            if isinstance(data, Base) and isinstance(data, ToolClass):
+                if schemas := kw.get('schemas', None):
+                    data = schemas(**data.vars())
                 data = jsonable_encoder(data)
-            kw['data'] = data
+                kw['data'] = data
 
         return func(*args, **kw)
     return wrapper

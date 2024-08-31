@@ -3,7 +3,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
-from .db import Base, ToolClass
+from app.core import Base, ToolClass
 
 
 class Role(Base, ToolClass):

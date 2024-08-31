@@ -8,20 +8,16 @@ from .role_schema import Role
 
 
 class UserBase(BaseModel):
-    email: str
-    username: str
-
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            datetime: lambda v: DateTimeUtil.strftime(v)
-        }
+    email: str | None = None
+    username: str | None = None
 
 
 class UserCreate(UserBase):
-    email: str | None = None
-    username: str | None = None
     password: str
+
+
+class UserLogin(UserCreate):
+    pass
 
 
 class UserInDB(UserBase):
@@ -33,7 +29,17 @@ class UserInDB(UserBase):
     created_at: datetime
 
 
+
 class User(UserBase):
-    id: int
     roles: list[Role] = []
-    is_active: bool
+
+    class Config:
+        from_attributes = True
+        json_encoders = {
+            datetime: lambda v: DateTimeUtil.strftime(v)
+        }
+
+
+class UserInToken(BaseModel):
+    username: str
+    is_active: bool = True

@@ -28,4 +28,4 @@ async def delete():
 
 
 async def get_page():
-    return Result.success()
+    raise TODOException()

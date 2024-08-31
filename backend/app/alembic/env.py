@@ -21,8 +21,7 @@ if config.config_file_name is not None:
 
 import sys
 sys.path.append(__file__[:__file__.index('backend') + len('backend')])
-from app.models import Base
-from app.core import config as app_config
+from app.core import Base, config as app_config
 
 target_metadata = Base.metadata
 
