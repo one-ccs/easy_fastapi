@@ -2,6 +2,8 @@
 
 基于 FastAPI 开发的后端框架，集成 SQLAlchemy、Pydantic、Alembic、PyJWT 等插件。
 
+![alt text](backend/preview/preview_1.jpeg)
+
 ## 一、目录结构说明
 
 ```plaintext
@@ -10,14 +12,22 @@ project-root/
 ├─ backend/  # 后端项目目录（python 3.12.4）
 │   ├─ app/      # fastapi 项目目录
 │   │   ├─ alembic/  # 数据迁移目录
-│   │   │   ├─ versions # 数据库迁移文件
-│   │   │   ├─ env.py   # 环境配置文件
+│   │   │   ├─ versions   # 数据库迁移版本文件
+│   │   │   ├─ env.py     # 环境配置文件
 │   │   │   ├─ ...
 │   │   │
-│   │   ├─ exceptions/ # 错误处理目录
+│   │   ├─ core/  # 核心配置文件
+│   │   │   ├─ exceptions/   # 异常类目录
+│   │   │   │   ├─ *_exception.py        # 自定义异常类
+│   │   │   │   ├─ ...
+│   │   │   │
+│   │   │   ├─ authorization.py     # 认证授权相关配置
+│   │   │   ├─ config.py            # 项目配置
+│   │   │   ├─ db.py                # 数据库配置
 │   │   │   ├─ exception_handler.py # 错误处理器
-│   │   │   ├─ *_exception.py       # 自定义错误类
-│   │   │   ├─ ...
+│   │   │   ├─ redis.py             # redis 配置
+│   │   │   ├─ result.py            # 响应体数据类
+│   │   │   ├─ yaml.py              # yaml 配置
 │   │   │
 │   │   ├─ models/     # 数据库模型目录
 │   │   │   ├─ crud         # 数据库 crud 函数目录
@@ -41,16 +51,16 @@ project-root/
 │   │   │
 │   │   ├─ utils/      # 工具函数目录
 │   │   │   ├─ crud_utils # 数据库 crud 工具函数
-│   │   │   │   ├─ result.py        # 响应体数据类
 │   │   │   │   ├─ datetime_util.py # 日期时间相关工具类
+│   │   │   │   ├─ object_util.py   # 对象相关工具类
 │   │   │   │   ├─ path_util.py     # 路径相关工具类
-│   │   │   │   ├─ *_util.py        # 与 models 对应的 curd 工具函数
+│   │   │   │   ├─ string_util.py   # 字符串相关工具类
 │   │   │   │   ├─ ...
 │   │   │
-│   │   ├─ __init__.py # 导入路由并单独导入错误处理包
-│   │   ├─ alembic.ini # 数据库迁移配置文件
-│   │   ├─ config.py   # 配置文件
-│   │   ├─ main.py     # 程序入口
+│   │   ├─ __init__.py      # 导入路、初始化配置、导入错误处理
+│   │   ├─ alembic.ini      # 数据库迁移配置文件
+│   │   ├─ easy_fastapi.py  # 配置文件
+│   │   ├─ main.py          # 程序入口
 │   │   ├─ requirements.txt # 依赖列表
 │   │
 │   ├─ db/ # 数据库文件目录
@@ -59,6 +69,7 @@ project-root/
 ├─ frontend/ # 前端项目目录
 │   │ ...
 │
+├─ license   # MIT 开源协议
 ├─ readme.md # 工程自述
 ├─ ...
 ```
@@ -66,12 +77,12 @@ project-root/
 ## 二、部署
 
 1. 安装依赖
-2. 修改 `DB_PASS`
-3. 修改 `ROOT_NAME`
+2. 修改 `backend/app/core/config.py` 文件中 `ROOT_NAME` 常量值为项目根目录文件名
+3. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
 4. 初始化数据库
 5. 启动项目
 
-## 数据库迁移插件 alembic
+## 三、数据库迁移插件 alembic
 
 ### 1、环境搭建
 
