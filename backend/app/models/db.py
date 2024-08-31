@@ -4,11 +4,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from app.config import Setting
+from app.core import config
 from app.utils import ObjectUtil
 
 
-engine = create_engine(Setting.DB_URI)
+engine = create_engine(config.DATABASE_URI)
 
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
 

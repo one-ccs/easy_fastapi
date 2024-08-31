@@ -8,8 +8,7 @@ import bcrypt
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from app.core import UnauthorizedException, ForbiddenException
-from app.config import AuthorizationSetting
+from app.core import UnauthorizedException, ForbiddenException, config
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='api/login')
@@ -27,24 +26,24 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def create_access_token(data: dict):
-    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=AuthorizationSetting.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = data.copy()
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, AuthorizationSetting.SECRET_KEY, algorithm=AuthorizationSetting.ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
 
 
 def create_refresh_token(data: dict):
-    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=AuthorizationSetting.REFRESH_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=config.REFRESH_TOKEN_EXPIRE_MINUTES)
     to_encode = data.copy()
     to_encode.update({'exp': expire, 'refresh_token': True})
-    encoded_jwt = jwt.encode(to_encode, AuthorizationSetting.SECRET_KEY, algorithm=AuthorizationSetting.ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
 
 
 def decode_token(token: str) -> dict:
     try:
-        payload = jwt.decode(token, AuthorizationSetting.SECRET_KEY, algorithms=[AuthorizationSetting.ALGORITHM])
+        payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
         raise UnauthorizedException('访问令牌已过期')

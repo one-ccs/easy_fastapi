@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 
 
 class DateTimeUtil(object):
@@ -10,12 +10,12 @@ class DateTimeUtil(object):
     @staticmethod
     def now() -> datetime:
         """返回 datetime 格式的当前时间"""
-        return datetime.now()
+        return datetime.now(tz=timezone.utc)
 
     @staticmethod
     def str_now(format=r'%Y-%m-%d %H:%M:%S') -> str:
         """返回字符串格式的当前时间"""
-        return datetime.now().strftime(format)
+        return datetime.now(tz=timezone.utc).strftime(format)
 
     @staticmethod
     def diff(minuend: str, minus: str, format=r'%Y-%m-%d %H:%M:%S') -> timedelta:

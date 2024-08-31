@@ -98,14 +98,14 @@ fileConfig(config.config_file_name, encoding='utf-8')
 import sys
 sys.path.append(__file__[:__file__.index('backend') + len('backend')])
 from app.models import Base
-from app.config import Setting
+from app.core import config as app_config
 
 target_metadata = Base.metadata
 ```
 
 ```python
 def get_url():
-    return str(Setting.DB_URI)
+    return app_config.DATABASE_URI
 
 
 def run_migrations_offline() -> None:

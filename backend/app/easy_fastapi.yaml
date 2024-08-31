@@ -1,0 +1,16 @@
+easy_fastapi:
+    database:
+        url: mysql://127.0.0.1:3306/easy_fastapi
+        username: root
+        password: 123456
+    authorization:
+        secret_key: easy_fastapi
+        access_token_expire_minutes: 30
+        refresh_token_expire_days: 10080
+    resources:
+        upload_folder: ${PROJECT_DIR}/upload
+        templates_folder: ${PROJECT_DIR}/frontend/dist
+        static_folder: ${PROJECT_DIR}/frontend/dist/static
+    logging:
+        level: INFO
+        file: easy_fastapi_info_${DATE}.log

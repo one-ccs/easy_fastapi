@@ -57,9 +57,9 @@ class ObjectUtil(object):
         ignore = kw.get('ignore', [])
         for k, v in kw.items():
             if style == 'snake':
-                k = StringUtils.camel_to_snake(k)
+                k = StringUtil.camel_to_snake(k)
             if style == 'camel':
-                k = StringUtils.snake_to_camel(k)
+                k = StringUtil.snake_to_camel(k)
             if hasattr(obj, k) and k not in ignore:
                 setattr(obj, k, v)
         return obj
