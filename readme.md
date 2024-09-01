@@ -1,10 +1,17 @@
 # Easy FastAPI
 
-基于 FastAPI 开发的后端框架，集成 SQLAlchemy、Pydantic、Alembic、PyJWT 等插件。
+基于 FastAPI 开发的后端框架，集成了 SQLAlchemy、Pydantic、Alembic、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。
 
 ![alt text](backend/preview/preview_1.jpeg)
 
-## 一、目录结构说明
+## 一、主要特点
+
+1. 集成多种插件：集成了 SQLAlchemy（数据库 ORM）、Pydantic（数据验证和序列化）、Alembic（数据库迁移）、PyJWT（JWT 认证）、PyYAML（项目配置读取）、Redis（登出黑名单） 等常用插件，提升开发效率。
+2. 清晰的目录结构：通过明确的目录划分，如核心配置、数据库模型、路由、数据结构、事务处理和工具函数等，使项目结构清晰，便于维护和扩展。
+3. 认证授权：内置认证授权模块，支持 JWT 认证，保障系统安全。
+4. 数据库迁移支持：利用 Alembic 进行数据库迁移，支持自动生成迁移文件和更新数据库，确保数据库结构与代码同步。
+
+## 二、目录结构说明
 
 ```plaintext
 project-root/
@@ -14,12 +21,11 @@ project-root/
 │   │   ├─ alembic/  # 数据迁移目录
 │   │   │   ├─ versions   # 数据库迁移版本文件
 │   │   │   ├─ env.py     # 环境配置文件
-│   │   │   ├─ ...
+│   │   │   └─ ...
 │   │   │
 │   │   ├─ core/  # 核心配置文件
 │   │   │   ├─ exceptions/   # 异常类目录
-│   │   │   │   ├─ *_exception.py        # 自定义异常类
-│   │   │   │   ├─ ...
+│   │   │   │   └─ *_exception.py        # 自定义异常类
 │   │   │   │
 │   │   │   ├─ authorization.py     # 认证授权相关配置
 │   │   │   ├─ config.py            # 项目配置
@@ -27,27 +33,27 @@ project-root/
 │   │   │   ├─ exception_handler.py # 错误处理器
 │   │   │   ├─ redis.py             # redis 配置
 │   │   │   ├─ result.py            # 响应体数据类
-│   │   │   ├─ yaml.py              # yaml 配置
+│   │   │   └─ yaml.py              # yaml 配置
 │   │   │
 │   │   ├─ models/     # 数据库模型目录
 │   │   │   ├─ crud         # 数据库 crud 函数目录
 │   │   │   │   ├─ *_crud.py        # 对应类的数据库操作函数
-│   │   │   │   ├─ ...
+│   │   │   │   └─ ...
 │   │   │   │
 │   │   │   ├─ *.py         # 数据库模型（user、role 等）
-│   │   │   ├─ ...
+│   │   │   └─ ...
 │   │   │
 │   │   ├─ routers/    # 路由目录（定义路由相关信息）
 │   │   │   ├─ *_router.py  # 路由（user_router、role_router 等）
-│   │   │   ├─ ...
+│   │   │   └─ ...
 │   │   │
 │   │   ├─ schemas/    # pydantic 数据结构目录（定义请求响应参数结构）
 │   │   │   ├─ *_schema.py  # 参数结构定义
-│   │   │   ├─ ...
+│   │   │   └─ ...
 │   │   │
 │   │   ├─ services/   # 事务处理目录（实现路由对应的逻辑）
 │   │   │   ├─ *_service.py # 事务逻辑处理函数（user_service 等）
-│   │   │   ├─ ...
+│   │   │   └─ ...
 │   │   │
 │   │   ├─ utils/      # 工具函数目录
 │   │   │   ├─ crud_utils # 数据库 crud 工具函数
@@ -55,34 +61,36 @@ project-root/
 │   │   │   │   ├─ object_util.py   # 对象相关工具类
 │   │   │   │   ├─ path_util.py     # 路径相关工具类
 │   │   │   │   ├─ string_util.py   # 字符串相关工具类
-│   │   │   │   ├─ ...
+│   │   │   │   └─ ...
+│   │   │   │
 │   │   │
 │   │   ├─ __init__.py      # 导入路、初始化配置、导入错误处理
 │   │   ├─ alembic.ini      # 数据库迁移配置文件
 │   │   ├─ easy_fastapi.py  # 配置文件
 │   │   ├─ main.py          # 程序入口
-│   │   ├─ requirements.txt # 依赖列表
+│   │   └─ requirements.txt # 依赖列表
 │   │
 │   ├─ db/ # 数据库文件目录
-│   │   ├─  easy_fastapi.sql
+│   │   └─  easy_fastapi.sql
+│   │
 │
 ├─ frontend/ # 前端项目目录
-│   │ ...
+│   └─ ...
 │
 ├─ license   # MIT 开源协议
 ├─ readme.md # 工程自述
-├─ ...
+└─ ...
 ```
 
-## 二、部署
+## 三、部署
 
-1. 安装依赖
+1. 安装依赖 `cd backend/app && pip install -r requirements.txt`
 2. 修改 `backend/app/core/config.py` 文件中 `ROOT_NAME` 常量值为项目根目录文件名
 3. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
-4. 初始化数据库
-5. 启动项目
+4. 初始化数据库 `alembic upgrade head`
+5. 启动项目 `cd backend && uvicorn app:app --reload --port 26029`
 
-## 三、数据库迁移插件 alembic
+## 四、数据库迁移插件 alembic
 
 ### 1、环境搭建
 

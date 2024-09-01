@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title='Easy FastAPI',
-    description='基于 FastAPI 开发的后端框架，集成 SQLAlchemy、Pydantic、Alembic、PyJWT 等插件。',
-    version='0.0.1',
+    description='基于 FastAPI 开发的后端框架，集成了 SQLAlchemy、Pydantic、Alembic、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。',
+    version='1.3.0',
     contact={
         'name': 'one-ccs@foxmail.com',
         'email': 'one-ccs@foxmail.com',
