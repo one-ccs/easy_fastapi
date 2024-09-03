@@ -9,7 +9,6 @@ from app.core import Base, ToolClass
 from app.utils import DateTimeUtil
 
 
-@dataclass
 class User(Base, ToolClass):
     __tablename__ = 'user'
 

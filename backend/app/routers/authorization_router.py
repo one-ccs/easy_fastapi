@@ -27,7 +27,10 @@ async def refresh(
 
 
 @authorization_router.post('/register', summary='注册', description='用户注册接口')
-async def register(form_data: schemas.UserCreate, db: Session = Depends(core.get_db)):
+async def register(
+    form_data: schemas.UserCreate,
+    db: Session = Depends(core.get_db),
+):
     return await authorization_service.register(form_data, db)
 
 

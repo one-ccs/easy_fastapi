@@ -1,20 +1,43 @@
+# 项目配置文件
+#
+# 可使用变量：
+#     ${PROJECT_DIR} 项目根路径
+#     ${DATE} 当前日期
+#
+
 easy_fastapi:
+    app:
+        # 是否强制所有除 500 外的状态码都返回 200 状态码，默认 false
+        force_200_code: false
+    # 数据库配置
     database:
         url: mysql://127.0.0.1:3306/easy_fastapi
         username: root
         password: 123456
+    # redis 配置
     redis:
         host: 127.0.0.1
+        # 端口号，默认 6379
         port: 6379
+        # 数据库号，默认 0
         db: 0
+    # 安全认证配置
     authorization:
+        # 密钥，默认 None
         secret_key: easy_fastapi
+        # 算法，默认 HS256
         algorithm: HS256
+        # 访问令牌过期时间，默认 15 分钟
         access_token_expire_minutes: 30
+        # 刷新令牌过期时间，默认 10080 分钟，即 7 天
         refresh_token_expire_days: 10080
+    # 路径相关配置
     resources:
+        # 上传文件保存目录
         upload_folder: ${PROJECT_DIR}/upload
+        # 模板文件目录
         templates_folder: ${PROJECT_DIR}/frontend/dist
+        # 静态文件目录
         static_folder: ${PROJECT_DIR}/frontend/dist/static
     logging:
         level: INFO

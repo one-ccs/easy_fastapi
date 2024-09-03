@@ -2,8 +2,13 @@
 # -*- coding: utf-8 -*-
 from pydantic import BaseModel
 
+from .user_schema import User
 
-class Result(BaseModel):
+
+class BaseResult(BaseModel):
     code: int
     message: str
-    data: dict | None = None
+
+
+class ResultUser(BaseResult):
+    data: User | None = None

@@ -1,78 +1,73 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from typing import Any
+
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
 
-from .db import Base, ToolClass
-
-
-def json_encoder(func):
-    """对不可 json 序列化的参数进行处理"""
-    def wrapper(*args, **kw):
-        # 将 model 转为字典，若有 schema 则再转换一次
-        if data := kw.get('data', None):
-            if isinstance(data, Base) and isinstance(data, ToolClass):
-                if schemas := kw.get('schemas', None):
-                    data = schemas(**data.vars())
-                data = jsonable_encoder(data)
-                kw['data'] = data
-
-        return func(*args, **kw)
-    return wrapper
+from .config import FORCE_200_CODE
 
 
-class Result(object):
+class JSONResponseResult(object):
+    """返回 JSONResponse"""
 
-    # 为 True 返回真实的状态码，为 False 全部返回 200
-    is_real_code = False
+    # 是否强制响应 200 状态码
+    force_200_code = FORCE_200_CODE
 
+    def __new__(cls, *, code: int, message: str, data: Any, schema: BaseModel) -> JSONResponse:
+        """规范化响应数据。
+        若 force_200_code = True，强制除 500 外的状态码为 200。此时返回
+        JSONResponse 并使路由装饰器的 response_model 参数无效，需手动指定
+        schema 进行序列化。
 
-    def __new__(cls, value: bool, success_message='请求成功', failure_message='请求失败') -> JSONResponse:
-        if value:
-            return cls.success(success_message)
-        else:
-            return cls.failure(failure_message)
+        Args:
+            code (int, optional): 响应状态码.
+            message (str, optional): 响应消息.
+            data (Any, optional): 响应数据.
+            schema (Any, optional): 响应数据 schema.
 
-    @json_encoder
-    @staticmethod
-    def success(message='请求成功', data=None, code=200, schemas=None):
+        Returns:
+            JSONResponse | dict: 若 force_200_code = True，返回 JSONResponse
+                并指定 status_code，否则返回 dict.
+        """
+        data = jsonable_encoder(data)
+
+        if schema:
+            data = jsonable_encoder(schema(**data))
+
         return JSONResponse(
             {'code': code, 'message': message, 'data': data},
-            code if Result.is_real_code else 200,
+            status_code=200 if cls.force_200_code else code,
         )
 
-    @json_encoder
-    @staticmethod
-    def failure(message='请求失败', data=None, code=400):
-        return JSONResponse(
-            {'code': code, 'message': message, 'data': data},
-            code if Result.is_real_code else 200,
-        )
+    @classmethod
+    def success(cls, message='请求成功', /, *, data=None, schema: BaseModel | None = None):
+        return cls(message=message, data=data, code=200, schema=schema)
 
-    @staticmethod
-    def unauthorized(message='请登录后操作'):
-        return JSONResponse(
-            {'code': 401, 'message': message, 'data': None},
-            401 if Result.is_real_code else 200,
-        )
+    @classmethod
+    def failure(cls, message='请求失败', /, *, data=None, schema: BaseModel | None = None):
+        return cls(message=message, data=data, code=400, schema=schema)
 
-    @staticmethod
-    def forbidden(message='您无权进行此操作'):
-        return JSONResponse(
-            {'code': 403, 'message': message, 'data': None},
-            403 if Result.is_real_code else 200,
-        )
+    @classmethod
+    def unauthorized(cls, message='请登录后操作', /):
+        return cls(message=message, data=None, code=401, schema=None)
 
-    @staticmethod
-    def error_404(message='什么都没有'):
-        return JSONResponse(
-            {'code': 404, 'message': message, 'data': None},
-            404 if Result.is_real_code else 200,
-        )
+    @classmethod
+    def forbidden(cls, message='您无权进行此操作', /):
+        return cls(message=message, data=None, code=403, schema=None)
 
-    @staticmethod
-    def method_not_allowed(message='不允许的请求方法'):
-        return JSONResponse(
-            {'code': 405, 'message': message, 'data': None},
-            405 if Result.is_real_code else 200,
-        )
+    @classmethod
+    def error_404(cls, message='什么都没有', /):
+        return cls(message=message, data=None, code=404, schema=None)
+
+    @classmethod
+    def method_not_allowed(cls, message='不允许的请求方法', /):
+        return cls(message=message, data=None, code=405, schema=None)
+
+
+class Result(JSONResponseResult):
+    """返回 dict"""
+
+    def __new__(cls, *, message: str, data: Any, code: int, schema: BaseModel) -> JSONResponse | dict:
+        return {'code': code, 'message': message, 'data': data}

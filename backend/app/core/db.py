@@ -37,5 +37,5 @@ class ToolClass:
     def vars(self, ignore=None):
         return ObjectUtil.vars(self, ignore or self.ignore_properties, style='camel')
 
-    def withDict(self, **kw):
+    def with_dict(self, **kw):
         return ObjectUtil.update_with_dict(self, **kw, ignore=('_sa_instance_state',), is_snake=True)
