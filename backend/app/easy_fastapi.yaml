@@ -1,8 +1,8 @@
 # 项目配置文件
 #
 # 可使用变量：
-#     ${PROJECT_DIR} 项目根路径
 #     ${DATE} 当前日期
+#     ${TIME} 当前时间
 #
 
 easy_fastapi:
@@ -34,11 +34,11 @@ easy_fastapi:
     # 路径相关配置
     resources:
         # 上传文件保存目录
-        upload_folder: ${PROJECT_DIR}/upload
+        upload_folder: ../upload
         # 模板文件目录
-        templates_folder: ${PROJECT_DIR}/frontend/dist
+        templates_folder: ../frontend/dist
         # 静态文件目录
-        static_folder: ${PROJECT_DIR}/frontend/dist/static
+        static_folder: ../frontend/dist/static
     logging:
         level: INFO
         file: easy_fastapi_info_${DATE}.log

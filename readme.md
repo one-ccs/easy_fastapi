@@ -85,8 +85,8 @@ project-root/
 ## 三、部署
 
 1. 安装依赖 `cd backend/app && pip install -r requirements.txt`
-2. 修改 `backend/app/core/config.py` 文件中 `ROOT_NAME` 常量值为项目根目录文件名
-3. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
+2. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
+3. 创建数据库
 4. 初始化数据库 `alembic upgrade head`
 5. 启动项目 `cd backend && uvicorn app:app --reload --port 26029`
 

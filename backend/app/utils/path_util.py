@@ -6,10 +6,8 @@ from pathlib import Path
 
 class PathUtil(object):
 
-    path = path
-
     @staticmethod
-    def getProjectRoot(root_name: str, join_path: str | None = None) -> str:
+    def get_project_root(root_name: str, join_path: str | None = None) -> str:
         """ 返回项目根目录的绝对地址
 
         :param root_name 跟文件夹名称

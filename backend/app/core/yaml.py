@@ -31,19 +31,22 @@ def write_yaml(data, yaml_file: str):
         yaml.safe_dump(data, f)
 
 
-def read_yaml_config(project_dir: str, config_file: str) -> dict:
+def read_yaml_config(config_path: str) -> dict:
     """读取程序配置文件，并替换内置变量
 
     Args:
-        project_dir (str): 项目根目录
-        config_file (str): 配置文件路径
+        config_path (str): 配置文件路径
 
     Returns:
         dict: 配置字典
     """
-    with open(f'{project_dir}/{config_file}', 'r', encoding=ENCODING) as f:
-        config = f.read()
-    config = config.replace('${PROJECT_DIR}', project_dir)
+    try:
+        with open(config_path, 'r', encoding=ENCODING) as f:
+            config = f.read()
+    except FileNotFoundError:
+        raise FileNotFoundError(f'配置文件 {config_path} 不存在')
+
+    # 替换内置变量
     config = config.replace('${DATE}', datetime.now(timezone.utc).strftime(r'%Y-%m-%d'))
     config = config.replace('${TIME}', datetime.now(timezone.utc).strftime(r'%H:%M:%S'))
 
