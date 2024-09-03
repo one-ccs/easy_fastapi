@@ -88,9 +88,14 @@ project-root/
 2. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
 3. 创建数据库
 4. 初始化数据库 `alembic upgrade head`
-5. 启动项目 `cd backend && uvicorn app:app --reload --port 26029`
+5. 启动项目 `cd backend && uvicorn app:app --reload` 或 `uvicorn backend.app:app --reload`
 
-## 四、数据库迁移插件 alembic
+## 四、测试
+
+1. 在 `backend/test` 目录中添加测试文件
+2. 运行 `cd backend/test && pytest` 查看测试结果
+
+## 五、数据库迁移插件 alembic
 
 ### 1、环境搭建
 

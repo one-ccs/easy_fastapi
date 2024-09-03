@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# 设置 sys.path 以便在任何工作目录启动后端时，都能正确导入模块
+import sys
+sys.path.append(__file__[:__file__.index('backend') + len('backend')])
+
 from .main import app
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 from app.utils import DateTimeUtil
@@ -33,11 +33,12 @@ class UserInDB(UserBase):
 class User(UserBase):
     roles: list[Role] = []
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            datetime: lambda v: DateTimeUtil.strftime(v)
-        }
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={
+            datetime: lambda v: DateTimeUtil.strftime(v),
+        },
+    )
 
 
 class UserInToken(BaseModel):

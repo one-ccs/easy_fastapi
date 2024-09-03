@@ -15,7 +15,7 @@ from app import core, schemas, models
 async def login(form_data: schemas.UserLogin, db: Session):
     user = models.crud.get_user_by_username(db, username=form_data.username)
     if not user:
-        raise FailureException('未找到该用户')
+        raise FailureException('用户名不存在')
     if not verify_password(form_data.password, user.hashed_password):
         raise FailureException('密码错误')
 
