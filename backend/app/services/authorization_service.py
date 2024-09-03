@@ -20,10 +20,10 @@ async def login(form_data: schemas.UserLogin, db: Session):
         raise FailureException('密码错误')
 
     access_token = create_access_token({
-        'username': user.username,
+        'sub': user.username,
     })
     refresh_token = create_refresh_token({
-        'username': user.username,
+        'sub': user.username,
     })
 
     return {
@@ -67,6 +67,14 @@ async def register(form_data: schemas.UserCreate, db: Session):
     })
 
 
-async def logout(token: str):
-    core.revoke_token(token)
+async def logout(refresh_token: str, access_token: str):
+    refresh_payload = core.decode_token(refresh_token)
+    access_payload = core.decode_token(access_token)
+
+    if not core.is_refresh_token(refresh_payload) or refresh_payload['sub'] != access_payload['sub']:
+        raise FailureException('非法的刷新令牌')
+
+    core.revoke_token(refresh_token)
+    core.revoke_token(access_token)
+
     return Result.success('登出成功')

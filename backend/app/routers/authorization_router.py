@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.services import authorization_service
-from app import core, schemas, models
+from app import core, schemas
 
 
 authorization_router = APIRouter()
@@ -35,5 +35,8 @@ async def register(
 
 
 @authorization_router.post('/logout', summary='登出', description='用户登出接口')
-async def logout(token: str = Depends(core.require_refresh_token)):
-    return await authorization_service.logout(token)
+async def logout(
+    refresh_token: str,
+    access_token: str = Depends(core.require_token),
+):
+    return await authorization_service.logout(refresh_token, access_token)

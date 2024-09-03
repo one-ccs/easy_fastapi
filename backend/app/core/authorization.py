@@ -60,9 +60,9 @@ def revoke_token(token: str) -> bool:
     redis_conn.set(token, 1, ex=config.ACCESS_TOKEN_EXPIRE_MINUTES)
 
 
-def is_refresh_token(token: str) -> bool:
+def is_refresh_token(token: str | dict) -> bool:
     """判断是否是刷新令牌"""
-    payload = decode_token(token)
+    payload = token if isinstance(token, dict) else decode_token(token)
 
     return payload.get('refresh_token', False)
 
@@ -75,7 +75,7 @@ async def require_token(token: str = Depends(oauth2_scheme)) -> str:
 async def require_refresh_token(token: str = Depends(require_token)) -> str:
     """返回刷新令牌"""
     if not is_refresh_token(token):
-        raise FailureException('非刷新令牌')
+        raise FailureException('需要刷新令牌')
     return token
 
 
