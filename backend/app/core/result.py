@@ -25,11 +25,10 @@ class JSONResponseResult(object):
             code (int, optional): 响应状态码.
             message (str, optional): 响应消息.
             data (Any, optional): 响应数据.
-            schema (Any, optional): 响应数据 schema.
+            schema (BaseModel, optional): 响应数据 schema.
 
         Returns:
-            JSONResponse | dict: 若 force_200_code = True，返回 JSONResponse
-                并指定 status_code，否则返回 dict.
+            JSONResponse: JSONResponse 对象.
         """
         data = jsonable_encoder(data)
 
@@ -42,32 +41,32 @@ class JSONResponseResult(object):
         )
 
     @classmethod
-    def success(cls, message='请求成功', /, *, data=None, schema: BaseModel | None = None):
+    def success(cls, message = '请求成功', /, *, data=None, schema: BaseModel | None = None):
         return cls(message=message, data=data, code=200, schema=schema)
 
     @classmethod
-    def failure(cls, message='请求失败', /, *, data=None, schema: BaseModel | None = None):
+    def failure(cls, message = '请求失败', /, *, data=None, schema: BaseModel | None = None):
         return cls(message=message, data=data, code=400, schema=schema)
 
     @classmethod
-    def unauthorized(cls, message='请登录后操作', /):
+    def unauthorized(cls, message = '请登录后操作', /):
         return cls(message=message, data=None, code=401, schema=None)
 
     @classmethod
-    def forbidden(cls, message='您无权进行此操作', /):
+    def forbidden(cls, message = '您无权进行此操作', /):
         return cls(message=message, data=None, code=403, schema=None)
 
     @classmethod
-    def error_404(cls, message='什么都没有', /):
+    def error_404(cls, message = '什么都没有', /):
         return cls(message=message, data=None, code=404, schema=None)
 
     @classmethod
-    def method_not_allowed(cls, message='不允许的请求方法', /):
+    def method_not_allowed(cls, message = '不允许的请求方法', /):
         return cls(message=message, data=None, code=405, schema=None)
 
 
-class Result(JSONResponseResult):
+class Result():
     """返回 dict"""
 
-    def __new__(cls, *, message: str, data: Any, code: int, schema: BaseModel) -> JSONResponse | dict:
-        return {'code': code, 'message': message, 'data': data}
+    def __new__(cls, message: str = '请求成功', /, *, data: Any = None) -> dict:
+        return {'code': 200, 'message': message, 'data': data}

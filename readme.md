@@ -82,7 +82,25 @@ project-root/
 └─ ...
 ```
 
-## 三、部署
+## 三、规约
+
+1. 所有非 200 响应均 raise 对应异常
+
+正例：
+
+```python
+if not verify_password(form_data.password, user.hashed_password):
+        raise FailureException('密码错误')
+```
+
+反例：
+
+```python
+if not verify_password(form_data.password, user.hashed_password):
+        return JSONResponseResult.failure('密码错误')
+```
+
+## 四、部署
 
 1. 安装依赖 `cd backend/app && pip install -r requirements.txt`
 2. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
@@ -90,12 +108,12 @@ project-root/
 4. 初始化数据库 `alembic upgrade head`
 5. 启动项目 `cd backend && uvicorn app:app --reload` 或 `uvicorn backend.app:app --reload`
 
-## 四、测试
+## 五、测试
 
 1. 在 `backend/test` 目录中添加测试文件
 2. 运行 `cd backend/test && pytest` 查看测试结果
 
-## 五、数据库迁移插件 alembic
+## 六、数据库迁移插件 alembic
 
 ### 1、环境搭建
 

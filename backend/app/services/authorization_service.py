@@ -6,10 +6,13 @@ from app.core import (
     FailureException,
     Result,
     verify_password,
+    decode_token,
+    revoke_token,
+    is_refresh_token,
     create_access_token,
     create_refresh_token,
 )
-from app import core, schemas, models
+from app import schemas, models
 
 
 async def login(form_data: schemas.UserLogin, db: Session):
@@ -34,7 +37,7 @@ async def login(form_data: schemas.UserLogin, db: Session):
         'access_token': access_token,
         'refresh_token': refresh_token,
     }
-    # return Result.success('登录成功', data={
+    # return Result('登录成功', data={
     #     'email': user.email,
     #     'username': user.username,
     #     'avatar_url': user.avatar_url,
@@ -47,7 +50,7 @@ async def login(form_data: schemas.UserLogin, db: Session):
 async def refresh(current_user: schemas.UserInToken):
     access_token = create_access_token(current_user.model_dump())
 
-    return Result.success('刷新令牌成功', data={
+    return Result('刷新令牌成功', data={
         'token_type': 'bearer',
         'access_token': access_token,
     })
@@ -62,19 +65,19 @@ async def register(form_data: schemas.UserCreate, db: Session):
         raise FailureException('邮箱已存在')
     user = models.crud.create_user(db, form_data)
 
-    return Result.success('注册成功', data={
+    return Result('注册成功', data={
         'username': user.username or user.email,
     })
 
 
 async def logout(refresh_token: str, access_token: str):
-    refresh_payload = core.decode_token(refresh_token)
-    access_payload = core.decode_token(access_token)
+    refresh_payload = decode_token(refresh_token)
+    access_payload = decode_token(access_token)
 
-    if not core.is_refresh_token(refresh_payload) or refresh_payload['sub'] != access_payload['sub']:
+    if not is_refresh_token(refresh_payload) or refresh_payload['sub'] != access_payload['sub']:
         raise FailureException('非法的刷新令牌')
 
-    core.revoke_token(refresh_token)
-    core.revoke_token(access_token)
+    revoke_token(refresh_token)
+    revoke_token(access_token)
 
-    return Result.success('登出成功')
+    return Result('登出成功')

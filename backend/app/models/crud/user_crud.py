@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.orm import Session
 
-from app import core, models, schemas
+from app.core import (
+    encrypt_password,
+)
+from app import models, schemas
 
 
 def get_user(db: Session, user_id: int):
@@ -25,7 +28,7 @@ def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(
         email=user.email,
         username=user.username,
-        hashed_password=core.encrypt_password(user.password),
+        hashed_password=encrypt_password(user.password),
     )
     db.add(db_user)
     db.commit()

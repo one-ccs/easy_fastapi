@@ -20,6 +20,7 @@ from app import app
 
 @app.exception_handler(Exception)
 async def server_exception_handler(request: Request, exc: Exception):
+    # TODO 输出到日志
     return JSONResponseResult.failure('服务器错误，请联系管理员')
 
 
@@ -38,12 +39,14 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         case 405:
             return JSONResponseResult.method_not_allowed()
         case _:
-            return JSONResponseResult.failure(f'未知 HTTP 错误, {exc.detail}', code=exc.status_code)
+            # TODO 输出到日志
+            return JSONResponseResult.failure('未知 HTTP 错误')
 
 
 @app.exception_handler(RequestValidationError)
 async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponseResult.failure(exc.errors())
+    # TODO 输出到日志
+    return JSONResponseResult.failure('请求参数有误')
 
 
 ################## JWT 异常 ##################
@@ -71,7 +74,7 @@ async def jwt_exception_handler_4(request: Request, exc: jwt.InvalidTokenError):
 
 @app.exception_handler(jwt.PyJWTError)
 async def jwt_exception_handler_5(request: Request, exc: jwt.PyJWTError):
-    return JSONResponseResult.failure('未知令牌错误')
+    return JSONResponseResult.unauthorized('未知令牌错误')
 
 
 ################## 自定义异常 ##################
