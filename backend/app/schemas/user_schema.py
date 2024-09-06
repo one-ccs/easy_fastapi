@@ -16,12 +16,17 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserLogin(UserCreate):
-    pass
-
-
-class User(UserBase):
+class UserInfo(UserBase):
+    avatar_url: str | None = None
+    created_at: datetime
     roles: list[Role] = []
+
+
+class UserLogin(BaseModel):
+    user_info: UserInfo
+    token_type: str
+    access_token: str
+    refresh_token: str
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -29,9 +34,3 @@ class User(UserBase):
             datetime: lambda v: DateTimeUtil.strftime(v),
         },
     )
-
-class LoginResponse(UserBase):
-    avatar_url: str | None = None
-    token_type: str = "bearer"
-    access_token: str
-    refresh_token: str

@@ -33,7 +33,7 @@ def get_user_by_username_or_email(db: Session, username_or_email: str):
     return db.exec(statement).first()
 
 
-def get_users(db: Session, skip: int = 0, limit: int = 100):
+def get_page_users(db: Session, skip: int = 0, limit: int = 100):
     statement = select(models.User).offset(skip).limit(limit)
     return db.exec(statement).all()
 
@@ -48,3 +48,10 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def get_user_roles(db: Session, user_id: int):
+    statement = select(models.Role) \
+        .join(models.RelUserRole) \
+        .where(models.RelUserRole.user_id == user_id)
+    return db.exec(statement).all()

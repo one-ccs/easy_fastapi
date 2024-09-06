@@ -2,15 +2,22 @@
 # -*- coding: utf-8 -*-
 from pydantic import BaseModel
 
-from .user_schema import User, LoginResponse
+from .user_schema import UserInfo, UserLogin
+from .role_schema import Role
 
 
 class BaseResult(BaseModel):
     code: int
     message: str
 
+
 class ResultLogin(BaseResult):
-    data: LoginResponse
+    data: UserLogin
+
 
 class ResultUser(BaseResult):
-    data: User | None = None
+    data: UserInfo | None = None
+
+
+class ResultRoles(BaseResult):
+    data: list[Role] | None = None

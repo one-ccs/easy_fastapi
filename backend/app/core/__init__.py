@@ -23,7 +23,7 @@ from .authorization import (
     get_current_user,
     get_current_refresh_user,
 )
-from .db import get_db, ToolClass
+from .db import get_db
 from .redis import redis_conn
 from .result import Result, JSONResponseResult
 
@@ -58,7 +58,6 @@ __all__ = [
     'get_current_refresh_user',
 
     'get_db',
-    'ToolClass',
 
     'redis_conn',
 

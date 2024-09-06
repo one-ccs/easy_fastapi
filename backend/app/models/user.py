@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 
-from app.core import ToolClass
+from .rel_user_role import RelUserRole
+from .role import Role
 from app.utils import DateTimeUtil
 
 
-class User(SQLModel, ToolClass, table=True):
+class User(SQLModel, table=True):
     __tablename__ = 'user'
 
     id: int | None = Field(None, primary_key=True)
@@ -19,3 +20,5 @@ class User(SQLModel, ToolClass, table=True):
     avatar_url: str | None
     is_active: bool = Field(True)
     created_at: datetime = Field(default_factory=DateTimeUtil.now)
+
+    roles: list[Role] = Relationship(back_populates='users', link_model=RelUserRole)

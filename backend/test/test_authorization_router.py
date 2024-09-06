@@ -14,8 +14,8 @@ def test_login_success():
         data={'username': 'user', 'password': '123'},
     )
     assert response.status_code == 200
-    assert 'access_token' in response.json()
-    assert 'refresh_token' in response.json()
+    assert 'access_token' in response.json().get('data', {})
+    assert 'refresh_token' in response.json().get('data', {})
 
 
 def test_login_unknown_username():
@@ -24,7 +24,7 @@ def test_login_unknown_username():
         data={'username': 'unknown', 'password': '123'},
     )
     assert response.status_code == 400
-    assert response.json() == {'code': 400,'message': '用户名不存在', 'data': None}
+    assert response.json() == {'code': 400,'message': '用户名或邮箱不存在', 'data': None}
 
 
 def test_login_bad_password():
@@ -37,12 +37,13 @@ def test_login_bad_password():
 
 
 def test_register_success():
+    username = 'new_user 2'
     response = client.post(
         '/api/register',
-        json={'username': 'new_user', 'password': '123456'},
+        json={'username': username, 'password': '123456'},
     )
     assert response.status_code == 200
-    assert response.json() == {'code': 200, 'message': '注册成功', 'data': {'username': 'new_user'}}
+    assert response.json() == {'code': 200, 'message': '注册成功', 'data': {'username': username}}
 
 
 def test_register_username_exists():

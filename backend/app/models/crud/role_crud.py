@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 from app import models, schemas
 
 
-def get_roles(db: Session, skip: int = 0, limit: int = 100):
+def get_page_roles(db: Session, skip: int = 0, limit: int = 100):
     statement = select(models.Role).offset(skip).limit(limit)
     return db.exec(statement).all()
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
 from app.core import (
@@ -15,7 +16,7 @@ from app.core import (
 from app import schemas, models
 
 
-async def login(form_data: schemas.UserLogin, db: Session):
+async def login(form_data: OAuth2PasswordRequestForm, db: Session):
     user = models.crud.get_user_by_username_or_email(db, form_data.username)
     if not user:
         raise FailureException('用户名或邮箱不存在')
@@ -25,22 +26,12 @@ async def login(form_data: schemas.UserLogin, db: Session):
     access_token = create_access_token(sub=user.username)
     refresh_token = create_refresh_token(sub=user.username)
 
-    return {
-        'email': user.email,
-        'username': user.username,
-        'avatar_url': user.avatar_url,
+    return Result('登录成功', data={
+        'user_info': user,
         'token_type': 'bearer',
         'access_token': access_token,
         'refresh_token': refresh_token,
-    }
-    # return Result('登录成功', data={
-    #     'email': user.email,
-    #     'username': user.username,
-    #     'avatar_url': user.avatar_url,
-    #     'token_type': 'bearer',
-    #     'access_token': access_token,
-    #     'refresh_token': refresh_token,
-    # })
+    })
 
 
 async def refresh(current_user: TokenData):

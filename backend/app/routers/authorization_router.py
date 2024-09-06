@@ -17,7 +17,7 @@ from app import schemas
 authorization_router = APIRouter()
 
 
-@authorization_router.post('/login', summary='登录', description='用户登录接口')
+@authorization_router.post('/login', summary='登录', description='用户登录接口', response_model=schemas.ResultLogin)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),

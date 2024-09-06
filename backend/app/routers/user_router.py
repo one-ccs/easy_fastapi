@@ -48,7 +48,16 @@ async def delete(
 
 
 @user_router.get('/page', summary='获取用户列表')
-async def get_page(
+async def page(
     current_user: TokenData = Depends(get_current_user),
 ):
-    return await user_service.get_page()
+    return await user_service.page()
+
+
+@user_router.get('/roles', summary='获取用户角色', response_model=schemas.ResultRoles)
+async def get_user_roles(
+    user_id: int,
+    current_user: TokenData = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return await user_service.get_user_roles(user_id, db)

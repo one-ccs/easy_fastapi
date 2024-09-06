@@ -1,20 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
 class RoleBase(BaseModel):
     role: str
+    role_desc: str
 
 
-class RoleCreate(RoleBase):
-    pass
+class Role(RoleBase): ...
 
 
-class Role(RoleBase):
-    id: int
-    owner_id : int
-
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
+class RoleCreate(RoleBase): ...

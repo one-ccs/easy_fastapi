@@ -27,5 +27,10 @@ async def delete():
     raise TODOException()
 
 
-async def get_page():
+async def page():
     raise TODOException()
+
+
+async def get_user_roles(user_id: int, db: Session):
+    db_roles = models.crud.get_user_roles(db, user_id)
+    return Result(data=db_roles)
