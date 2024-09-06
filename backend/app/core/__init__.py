@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from .logger import logger
 from .exceptions import *
 from .yaml import (
     load_yaml,
@@ -28,6 +29,8 @@ from .result import Result, JSONResponseResult
 
 
 __all__ = [
+    'logger',
+
     'TODOException',
     'ForbiddenException',
     'FailureException',

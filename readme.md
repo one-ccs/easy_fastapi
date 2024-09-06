@@ -70,9 +70,15 @@ project-root/
 │   │   ├─ main.py          # 程序入口
 │   │   └─ requirements.txt # 依赖列表
 │   │
-│   ├─ db/ # 数据库文件目录
-│   │   └─  easy_fastapi.sql
+│   ├─ logs/ # 日志目录
+│   │   ├─  access.log      # 访问日志
+│   │   └─  default.log     # 默认日志
 │   │
+│   ├─ test/  # 测试目录
+│   │   ├─  test_authorization_router.py  # 认证授权测试文件
+│   │   └─  test_*.py                     # 其他测试文件
+│   │
+│   └─ uvicorn_log_config.json  # uvicorn 日志配置
 │
 ├─ frontend/ # 前端项目目录
 │   └─ ...
@@ -106,7 +112,8 @@ if not verify_password(form_data.password, user.hashed_password):
 2. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
 3. 创建数据库
 4. 初始化数据库 `alembic upgrade head`
-5. 启动项目 `cd backend && uvicorn app:app --reload` 或 `uvicorn backend.app:app --reload`
+5. 创建 `backend/logs` 目录
+6. 启动项目 `cd backend && uvicorn app:app --reload` 或 `cd backend && uvicorn app:app --reload --log-config uvicorn_log_config.json --log-level info`
 
 ## 五、测试
 
