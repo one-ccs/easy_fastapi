@@ -111,7 +111,10 @@ if not verify_password(form_data.password, user.hashed_password):
 1. 安装依赖 `cd backend/app && pip install -r requirements.txt`
 2. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
 3. 创建数据库
-4. 初始化数据库 `alembic upgrade head`
+4. 初始化数据库
+   1. 生成迁移文件 `alembic revision --autogenerate -m "初始化数据库"`
+   2. 在生成的迁移文件中添加代码 `import sqlmodel`
+   3. 执行迁移 `alembic upgrade head`
 5. 创建 `backend/logs` 目录
 6. 启动项目 `cd backend && uvicorn app:app --reload` 或 `cd backend && uvicorn app:app --reload --log-config uvicorn_log_config.json --log-level info`
 
@@ -146,10 +149,10 @@ fileConfig(config.config_file_name, encoding='utf-8')
 # target_metadata = None
 import sys
 sys.path.append(__file__[:__file__.index('backend') + len('backend')])
-from app.models import Base
+from sqlmodel import SQLModel
 from app.core import config as app_config
 
-target_metadata = Base.metadata
+target_metadata = SQLModel.metadata
 ```
 
 ```python

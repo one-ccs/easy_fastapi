@@ -1,23 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlmodel import Session, SQLModel, create_engine
 
-from . import config
 from app.utils import ObjectUtil
+from . import config
 
 
 engine = create_engine(config.DATABASE_URI)
 
-SessionLocal = sessionmaker(autoflush=False, bind=engine)
+SQLModel.metadata.create_all(engine)
 
-Base = declarative_base()
-
-Base.metadata.create_all(bind=engine)
 
 # Dependency
 def get_db():
-    db = SessionLocal()
+    db = Session(engine)
     try:
         yield db
     finally:

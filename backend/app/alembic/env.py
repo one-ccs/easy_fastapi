@@ -21,9 +21,10 @@ if config.config_file_name is not None:
 
 import sys
 sys.path.append(__file__[:__file__.index('backend') + len('backend')])
-from app.core import Base, config as app_config
+from sqlmodel import SQLModel
+from app.core import config as app_config
 
-target_metadata = Base.metadata
+target_metadata = SQLModel.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
 from app.core import (
     FailureException,
     Result,
+    TokenData,
     verify_password,
     decode_token,
     revoke_token,
-    is_refresh_token,
     create_access_token,
     create_refresh_token,
 )
@@ -16,18 +16,14 @@ from app import schemas, models
 
 
 async def login(form_data: schemas.UserLogin, db: Session):
-    user = models.crud.get_user_by_username(db, username=form_data.username)
+    user = models.crud.get_user_by_username_or_email(db, form_data.username)
     if not user:
-        raise FailureException('用户名不存在')
+        raise FailureException('用户名或邮箱不存在')
     if not verify_password(form_data.password, user.hashed_password):
         raise FailureException('密码错误')
 
-    access_token = create_access_token({
-        'sub': user.username,
-    })
-    refresh_token = create_refresh_token({
-        'sub': user.username,
-    })
+    access_token = create_access_token(sub=user.username)
+    refresh_token = create_refresh_token(sub=user.username)
 
     return {
         'email': user.email,
@@ -47,8 +43,8 @@ async def login(form_data: schemas.UserLogin, db: Session):
     # })
 
 
-async def refresh(current_user: schemas.UserInToken):
-    access_token = create_access_token(current_user.model_dump())
+async def refresh(current_user: TokenData):
+    access_token = create_access_token(sub=current_user.sub)
 
     return Result('刷新令牌成功', data={
         'token_type': 'bearer',
@@ -74,7 +70,7 @@ async def logout(refresh_token: str, access_token: str):
     refresh_payload = decode_token(refresh_token)
     access_payload = decode_token(access_token)
 
-    if not is_refresh_token(refresh_payload) or refresh_payload['sub'] != access_payload['sub']:
+    if not refresh_payload.isr or refresh_payload.sub != access_payload.sub:
         raise FailureException('非法的刷新令牌')
 
     revoke_token(refresh_token)

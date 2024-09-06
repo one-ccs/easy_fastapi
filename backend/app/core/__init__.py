@@ -11,19 +11,19 @@ from .yaml import (
 )
 from . import config
 from .authorization import (
+    TokenData,
     encrypt_password,
     verify_password,
     create_access_token,
     create_refresh_token,
     decode_token,
     revoke_token,
-    is_refresh_token,
     require_token,
     require_refresh_token,
     get_current_user,
-    get_current_of_refresh,
+    get_current_refresh_user,
 )
-from .db import Base, get_db, ToolClass
+from .db import get_db, ToolClass
 from .redis import redis_conn
 from .result import Result, JSONResponseResult
 
@@ -45,19 +45,18 @@ __all__ = [
 
     'config',
 
+    'TokenData',
     'encrypt_password',
     'verify_password',
     'create_access_token',
     'create_refresh_token',
     'decode_token',
     'revoke_token',
-    'is_refresh_token',
     'require_token',
     'require_refresh_token',
     'get_current_user',
-    'get_current_of_refresh',
+    'get_current_refresh_user',
 
-    'Base',
     'get_db',
     'ToolClass',
 

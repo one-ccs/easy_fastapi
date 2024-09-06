@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
 from app.core import TODOException, FailureException, Result
 from app import models, schemas

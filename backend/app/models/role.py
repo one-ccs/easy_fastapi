@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.orm import relationship
+from sqlmodel import SQLModel, Field
 
-from app.core import Base, ToolClass
+from app.core import ToolClass
 
 
-class Role(Base, ToolClass):
+class Role(SQLModel, ToolClass, table=True):
     __tablename__ = 'role'
 
-    id = Column(Integer, primary_key=True)
-    role = Column(String(16))
-    owner_id = Column(Integer, ForeignKey('user.id'))
-
-    owner = relationship('User', back_populates='role')
+    id: int | None = Field(None, primary_key=True)
+    role: str
+    role_desc: str

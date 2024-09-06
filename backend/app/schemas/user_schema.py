@@ -20,16 +20,6 @@ class UserLogin(UserCreate):
     pass
 
 
-class UserInDB(UserBase):
-    id: int
-    hashed_password: str
-    token: str
-    avatar_url: str
-    is_active: bool
-    created_at: datetime
-
-
-
 class User(UserBase):
     roles: list[Role] = []
 
@@ -40,7 +30,8 @@ class User(UserBase):
         },
     )
 
-
-class UserInToken(BaseModel):
-    username: str
-    is_active: bool = True
+class LoginResponse(UserBase):
+    avatar_url: str | None = None
+    token_type: str = "bearer"
+    access_token: str
+    refresh_token: str

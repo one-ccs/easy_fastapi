@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlmodel import Session
 
 from app.core import (
+    TokenData,
     get_db,
     require_token,
-    get_current_of_refresh,
+    get_current_refresh_user,
 )
 from app.services import authorization_service
 from app import schemas
@@ -26,7 +27,7 @@ async def login(
 
 @authorization_router.post('/refresh', summary='刷新令牌', description='刷新令牌接口')
 async def refresh(
-    current_user: schemas.UserInToken = Depends(get_current_of_refresh)
+    current_user: TokenData = Depends(get_current_refresh_user),
 ):
     return await authorization_service.refresh(current_user)
 
