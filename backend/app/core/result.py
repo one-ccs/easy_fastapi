@@ -6,25 +6,26 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
-from .config import FORCE_200_CODE
-
 
 class JSONResponseResult(object):
     """返回 JSONResponse"""
 
-    # 是否强制响应 200 状态码
-    force_200_code = FORCE_200_CODE
-
-    def __new__(cls, *, code: int, message: str, data: Any, schema: BaseModel) -> JSONResponse:
+    def __new__(
+        cls,
+        message: str = '请求成功',
+        *,
+        data: Any | None = None,
+        code: int = 200,
+        schema: BaseModel | None = None
+    ) -> JSONResponse:
         """规范化响应数据。
-        若 force_200_code = True，强制除 500 外的状态码为 200。此时返回
-        JSONResponse 并使路由装饰器的 response_model 参数无效，需手动指定
-        schema 进行序列化。
+        返回 JSONResponse 时，路由装饰器的 response_model 参数将无效，需手动
+        指定 schema 进行序列化。
 
         Args:
-            code (int, optional): 响应状态码.
             message (str, optional): 响应消息.
             data (Any, optional): 响应数据.
+            code (int, optional): 响应状态码.
             schema (BaseModel, optional): 响应数据 schema.
 
         Returns:
@@ -37,68 +38,84 @@ class JSONResponseResult(object):
 
         return JSONResponse(
             {'code': code, 'message': message, 'data': data},
-            status_code=200 if cls.force_200_code else code,
+            status_code=code,
         )
 
     @classmethod
-    def success(cls, message = '请求成功', /, *, data=None, schema: BaseModel | None = None):
-        return cls(message=message, data=data, code=200, schema=schema)
+    def failure(cls, message: str = '请求失败', *, data: Any | None = None, schema: BaseModel | None = None) -> JSONResponse:
+        return cls(message, data=data, code=400, schema=schema)
 
     @classmethod
-    def failure(cls, message = '请求失败', /, *, data=None, schema: BaseModel | None = None):
-        return cls(message=message, data=data, code=400, schema=schema)
+    def unauthorized(cls, message: str = '请登录后操作') -> JSONResponse:
+        return cls(message, data=None, code=401)
 
     @classmethod
-    def unauthorized(cls, message = '请登录后操作', /):
-        return cls(message=message, data=None, code=401, schema=None)
+    def forbidden(cls, message: str = '您无权进行此操作') -> JSONResponse:
+        return cls(message, data=None, code=403)
 
     @classmethod
-    def forbidden(cls, message = '您无权进行此操作', /):
-        return cls(message=message, data=None, code=403, schema=None)
+    def error_404(cls, message: str = '什么都没有') -> JSONResponse:
+        return cls(message, data=None, code=404)
 
     @classmethod
-    def error_404(cls, message = '什么都没有', /):
-        return cls(message=message, data=None, code=404, schema=None)
-
-    @classmethod
-    def method_not_allowed(cls, message = '不允许的请求方法', /):
-        return cls(message=message, data=None, code=405, schema=None)
+    def method_not_allowed(cls, message: str = '不允许的请求方法') -> JSONResponse:
+        return cls(message, data=None, code=405)
 
 
-class Result():
+class Result(object):
     """返回 dict"""
 
-    def __new__(cls, message: str = '请求成功', /, *, data: Any = None) -> dict:
-        return {'code': 200, 'message': message, 'data': data}
+    def __new__(cls, message: str = '请求成功', *, data: Any | None = None, code: int = 200) -> dict:
+        return {'code': code, 'message': message, 'data': data}
 
+    @classmethod
+    def failure(cls, message: str = '请求失败', *, data: Any | None = None) -> dict:
+        return cls(message, data=data, code=400)
 
-def result_of(data_type: Any, *, class_name: str | None = None) -> BaseModel:
-    """返回结构化的 BaseModel 类
+    @classmethod
+    def unauthorized(cls, message: str = '请登录后操作') -> dict:
+        return cls(message, data=None, code=401)
 
-    Args:
-        data_type (Any | None, optional): data 的数据类型. Defaults to None.
-        class_name (str, optional): 类型名称. Defaults to 'Result'.
+    @classmethod
+    def forbidden(cls, message: str = '您无权进行此操作') -> dict:
+        return cls(message, data=None, code=403)
 
-    Returns:
-        BaseModel: 结构化的 BaseModel 类.
-    """
-    if data_type.__class__ is type and not class_name:
-        raise ValueError('若 data_type 不是 BaseModel 类，则必须指定 class_name 参数')
+    @classmethod
+    def error_404(cls, message: str = '什么都没有') -> dict:
+        return cls(message, data=None, code=404)
 
-    if data_type is None:
-        name = 'Result'
-    elif data_type.__class__ is type:
-        name = f'Result{class_name}'
-    else:
-        name = f'Result{data_type.__name__}'
+    @classmethod
+    def method_not_allowed(cls, message: str = '不允许的请求方法') -> dict:
+        return cls(message, data=None, code=405)
 
-    bases = (BaseModel,)
-    namespace = {
-        '__annotations__': {
-            'code': int,
-            'message': str,
-            'data': data_type,
-        },
-    }
+    @staticmethod
+    def of(data_type: Any, *, class_name: str | None = None) -> BaseModel:
+        """返回结构化的 BaseModel 类
 
-    return type(name, bases, namespace)
+        Args:
+            data_type (Any | None, optional): data 的数据类型. Defaults to None.
+            class_name (str, optional): 类型名称. Defaults to 'Result'.
+
+        Returns:
+            BaseModel: 结构化的 BaseModel 类.
+        """
+        if data_type.__class__ is type and not class_name:
+            raise ValueError('若 data_type 不是 BaseModel 类，则必须指定 class_name 参数')
+
+        if data_type is None:
+            name = 'Result'
+        elif data_type.__class__ is type:
+            name = f'Result{class_name}'
+        else:
+            name = f'Result{data_type.__name__}'
+
+        bases = (BaseModel,)
+        attr = {
+            '__annotations__': {
+                'code': int,
+                'message': str,
+                'data': data_type,
+            },
+        }
+
+        return type(name, bases, attr)

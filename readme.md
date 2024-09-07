@@ -103,7 +103,7 @@ if not verify_password(form_data.password, user.hashed_password):
 
 ```python
 if not verify_password(form_data.password, user.hashed_password):
-        return JSONResponseResult.failure('密码错误')
+        return Result.failure('密码错误')
 ```
 
 ## 四、部署

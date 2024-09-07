@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.core.config import FORCE_200_CODE
 
 
 app = FastAPI(
@@ -24,3 +26,13 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+
+@app.middleware('http')
+async def response_status_code_middleware(request: Request, call_next) -> Response:
+    response: Response = await call_next(request)
+
+    if FORCE_200_CODE:
+        response.status_code = 200
+
+    return response

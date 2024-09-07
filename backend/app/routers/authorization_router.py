@@ -7,8 +7,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
 from app.core import (
+    Result,
     TokenData,
-    result_of,
     get_db,
     require_token,
     get_current_refresh_user,
@@ -24,7 +24,7 @@ authorization_router = APIRouter()
     '/login',
     summary='登录',
     description='用户登录接口',
-    response_model=result_of(schemas.UserLogin))
+    response_model=Result.of(schemas.UserLogin))
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
@@ -36,7 +36,7 @@ async def login(
     '/refresh',
     summary='刷新令牌',
     description='刷新令牌接口',
-    response_model=result_of(schemas.RefreshToken))
+    response_model=Result.of(schemas.RefreshToken))
 async def refresh(
     current_user: TokenData = Depends(get_current_refresh_user),
 ):
@@ -47,7 +47,7 @@ async def refresh(
     '/register',
     summary='注册',
     description='用户注册接口',
-    response_model=result_of(schemas.Register))
+    response_model=Result.of(schemas.Register))
 async def register(
     form_data: schemas.UserCreate,
     db: Session = Depends(get_db),
@@ -59,7 +59,7 @@ async def register(
     '/logout',
     summary='登出',
     description='用户登出接口',
-    response_model=result_of(None))
+    response_model=Result.of(None))
 async def logout(
     x_token: Annotated[str, Header(..., alias='X-Token', description='刷新令牌')],
     access_token: str = Depends(require_token),
