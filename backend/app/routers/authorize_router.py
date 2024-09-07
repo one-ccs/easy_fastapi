@@ -13,7 +13,7 @@ from app.core import (
     require_token,
     get_current_refresh_user,
 )
-from app.services import authorization_service
+from app.services import authorize_service
 from app import schemas
 
 
@@ -29,7 +29,7 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
-    return await authorization_service.login(form_data, db)
+    return await authorize_service.login(form_data, db)
 
 
 @authorization_router.post(
@@ -40,7 +40,7 @@ async def login(
 async def refresh(
     current_user: TokenData = Depends(get_current_refresh_user),
 ):
-    return await authorization_service.refresh(current_user)
+    return await authorize_service.refresh(current_user)
 
 
 @authorization_router.post(
@@ -52,7 +52,7 @@ async def register(
     form_data: schemas.UserCreate,
     db: Session = Depends(get_db),
 ):
-    return await authorization_service.register(form_data, db)
+    return await authorize_service.register(form_data, db)
 
 
 @authorization_router.post(
@@ -64,4 +64,4 @@ async def logout(
     x_token: Annotated[str, Header(..., alias='X-Token', description='刷新令牌')],
     access_token: str = Depends(require_token),
 ):
-    return await authorization_service.logout(x_token, access_token)
+    return await authorize_service.logout(x_token, access_token)

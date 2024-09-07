@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from fastapi.testclient import TestClient
 
 from app import app
@@ -37,7 +39,7 @@ def test_login_bad_password():
 
 
 def test_register_success():
-    username = 'new_user 2'
+    username = str(datetime.now().microsecond)
     response = client.post(
         '/api/register',
         json={'username': username, 'password': '123456'},
