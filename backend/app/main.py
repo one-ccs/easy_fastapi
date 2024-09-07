@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
-from app.core.config import FORCE_200_CODE
+from app.core import config
 
 
 app = FastAPI(
@@ -19,20 +22,38 @@ app = FastAPI(
         'url': 'https://github.com/one-ccs/easy_fastapi?tab=MIT-1-ov-file#readme',
     },
 )
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['*'],
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
+
+if config.CORS_ENABLED:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=config.CORS_ALLOW_ORIGINS,
+        allow_credentials=config.CORS_ALLOW_CREDENTIALS,
+        allow_methods=config.CORS_ALLOW_METHODS,
+        allow_headers=config.CORS_ALLOW_HEADERS,
+    )
+
+if config.HTTPS_REDIRECT_ENABLED:
+    app.add_middleware(HTTPSRedirectMiddleware)
+
+if config.TRUSTED_HOST_ENABLED:
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=config.TRUSTED_HOST_ALLOWED_HOSTS
+    )
+
+if config.GZIP_ENABLED:
+    app.add_middleware(
+        GZipMiddleware,
+        minimum_size=config.GZIP_MINIMUM_SIZE,
+        compresslevel=config.GZIP_COMPRESS_LEVEL
+    )
 
 
 @app.middleware('http')
 async def response_status_code_middleware(request: Request, call_next) -> Response:
     response: Response = await call_next(request)
 
-    if FORCE_200_CODE:
+    if config.FORCE_200_CODE:
         response.status_code = 200
 
     return response
