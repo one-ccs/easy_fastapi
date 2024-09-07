@@ -5,6 +5,7 @@ from sqlmodel import Session
 
 from app.core import (
     TokenData,
+    result_of,
     get_db,
     get_current_user,
 )
@@ -15,7 +16,7 @@ from app import schemas
 user_router = APIRouter()
 
 
-@user_router.get('', summary='查询用户信息', response_model=schemas.ResultUser)
+@user_router.get('', summary='查询用户信息', response_model=result_of(schemas.UserInfo))
 async def get(
     user_id: int,
     current_user: TokenData = Depends(get_current_user),
@@ -24,7 +25,7 @@ async def get(
     return await user_service.get(user_id, db)
 
 
-@user_router.put('', summary='添加用户', response_model=schemas.ResultUser)
+@user_router.put('', summary='添加用户', response_model=result_of(schemas.UserInfo))
 async def add(
     user: schemas.UserCreate,
     current_user: TokenData = Depends(get_current_user),
@@ -54,7 +55,7 @@ async def page(
     return await user_service.page()
 
 
-@user_router.get('/roles', summary='获取用户角色', response_model=schemas.ResultRoles)
+@user_router.get('/roles', summary='获取用户角色', response_model=result_of(list[schemas.Role], class_name='Roles'))
 async def get_user_roles(
     user_id: int,
     current_user: TokenData = Depends(get_current_user),

@@ -9,6 +9,3 @@ class RoleBase(BaseModel):
 
 
 class Role(RoleBase): ...
-
-
-class RoleCreate(RoleBase): ...

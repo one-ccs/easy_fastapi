@@ -10,7 +10,7 @@ def get_page_roles(db: Session, skip: int = 0, limit: int = 100):
     return db.exec(statement).all()
 
 
-def create_user_role(db: Session, role: schemas.RoleCreate, user_id: int):
+def create_user_role(db: Session, role: schemas.Role, user_id: int):
     db_role = models.Role(**role.model_dump())
     db.add(db_role)
     db.commit()

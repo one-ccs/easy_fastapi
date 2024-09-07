@@ -70,3 +70,35 @@ class Result():
 
     def __new__(cls, message: str = '请求成功', /, *, data: Any = None) -> dict:
         return {'code': 200, 'message': message, 'data': data}
+
+
+def result_of(data_type: Any, *, class_name: str | None = None) -> BaseModel:
+    """返回结构化的 BaseModel 类
+
+    Args:
+        data_type (Any | None, optional): data 的数据类型. Defaults to None.
+        class_name (str, optional): 类型名称. Defaults to 'Result'.
+
+    Returns:
+        BaseModel: 结构化的 BaseModel 类.
+    """
+    if data_type.__class__ is type and not class_name:
+        raise ValueError('若 data_type 不是 BaseModel 类，则必须指定 class_name 参数')
+
+    if data_type is None:
+        name = 'Result'
+    elif data_type.__class__ is type:
+        name = f'Result{class_name}'
+    else:
+        name = f'Result{data_type.__name__}'
+
+    bases = (BaseModel,)
+    namespace = {
+        '__annotations__': {
+            'code': int,
+            'message': str,
+            'data': data_type,
+        },
+    }
+
+    return type(name, bases, namespace)

@@ -25,7 +25,7 @@ from .authorization import (
 )
 from .db import get_db
 from .redis import redis_conn
-from .result import Result, JSONResponseResult
+from .result import Result, JSONResponseResult, result_of
 
 
 __all__ = [
@@ -63,4 +63,5 @@ __all__ = [
 
     'Result',
     'JSONResponseResult',
+    'result_of',
 ]
