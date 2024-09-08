@@ -4,13 +4,16 @@ from typing import Any
 from pathlib import Path
 from datetime import timedelta
 
-from .yaml import read_yaml_config
+from .yaml import read_yaml
 from app.utils import ObjectUtil, PathUtil
 
 
 CONFIG_PATH = Path(__file__).parent.parent.joinpath('easy_fastapi.yaml')
 
-yaml_config = read_yaml_config(CONFIG_PATH) or {}
+if not PathUtil.is_exists_file(CONFIG_PATH):
+    raise FileNotFoundError(f'配置文件 {CONFIG_PATH} 不存在')
+
+yaml_config = read_yaml(CONFIG_PATH) or {}
 
 
 def get_config(path: str, default: Any = None) -> Any:
@@ -39,6 +42,8 @@ TEMPLATES_FOLDER                = get_config('easy_fastapi.resources.templates_f
 STATIC_FOLDER                   = get_config('easy_fastapi.resources.static_folder', None)
 
 # fastapi
+ROOT_PATH: str                  = get_config('fastapi.root_path', '/api')
+
 CORS_ENABLED: bool              = get_config('fastapi.cors.cors_enabled', False)
 CORS_ALLOW_ORIGINS: list[str]   = get_config('fastapi.cors.cors_allow_origins', ['*'])
 CORS_ALLOW_CREDENTIALS: bool    = get_config('fastapi.cors.cors_allow_credentials', True)

@@ -21,6 +21,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
+    root_path=config.ROOT_PATH,
     title='Easy FastAPI',
     description='基于 FastAPI 开发的后端框架，集成了 SQLModel、Pydantic、Alembic、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。',
     version='1.3.0',

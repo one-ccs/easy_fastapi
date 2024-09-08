@@ -23,6 +23,13 @@ class UserInfo(UserBase):
     roles: list[Role] = []
 
 
+class UserModify(UserBase):
+    id: int
+    password: str | None = None
+    avatar_url: str | None = None
+    is_active: bool | None = None
+
+
 class UserLogin(BaseModel):
     user_info: UserInfo
     token_type: str

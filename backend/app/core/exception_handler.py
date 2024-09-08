@@ -10,6 +10,7 @@ from .exceptions import (
     FailureException,
     UnauthorizedException,
     ForbiddenException,
+    NotFoundException,
 )
 from app.core import JSONResponseResult, logger
 from app import app
@@ -100,3 +101,8 @@ async def unauthorized_exception_handler(request: Request, exc: UnauthorizedExce
 @app.exception_handler(ForbiddenException)
 async def forbidden_exception_handler(request: Request, exc: ForbiddenException):
     return JSONResponseResult.forbidden(exc.detail)
+
+
+@app.exception_handler(NotFoundException)
+async def notfound_exception_handler(request: Request, exc: NotFoundException):
+    return JSONResponseResult.error_404(exc.detail)

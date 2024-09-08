@@ -19,9 +19,9 @@ class User(BaseCRUD, SQLModel, table=True):
     email: EmailStr | None  = Field(None, unique=True, index=True, max_length=64)
     username: str | None    = Field(None, unique=True, index=True, max_length=32)
     hashed_password: str | None = Field(None, max_length=64)
-    token: str              = Field(None, max_length=64)
-    avatar_url: str         = Field(None, max_length=256)
-    is_active: bool         = Field(True)
+    token: str | None       = Field(None, max_length=64)
+    avatar_url: str | None  = Field(None, max_length=256)
+    is_active: bool | None  = Field(True)
     created_at: datetime    = Field(default_factory=DateTimeUtil.now)
 
     roles: list[Role]       = Relationship(back_populates='users', link_model=RelUserRole)
@@ -44,7 +44,7 @@ class User(BaseCRUD, SQLModel, table=True):
         ).first()
 
     @staticmethod
-    def get_roles(user_id: int) -> list[Role]:
-        return Role.query(RelUserRole.user_id == user_id) \
+    def get_roles(id: int) -> list[Role]:
+        return Role.query(RelUserRole.user_id == id) \
             .join(RelUserRole) \
             .all()

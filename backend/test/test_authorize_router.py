@@ -2,12 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from fastapi.testclient import TestClient
-
-from app import app
-
-
-client = TestClient(app)
+from . import client
 
 
 def test_login_success():
@@ -39,19 +34,22 @@ def test_login_bad_password():
 
 
 def test_register_success():
+    global access_token, refresh_token
+
     username = str(datetime.now().microsecond)
     response = client.post(
         '/api/register',
-        json={'username': username, 'password': '123456'},
+        data={'username': username, 'password': '123456'},
     )
     assert response.status_code == 200
     assert response.json() == {'code': 200, 'message': '注册成功', 'data': {'username': username}}
 
 
+
 def test_register_username_exists():
     response = client.post(
         '/api/register',
-        json={'username': 'user', 'password': '123'},
+        data={'username': 'user', 'password': '123'},
     )
     assert response.status_code == 400
     assert response.json() == {'code': 400, 'message': '用户名已存在', 'data': None}
@@ -60,7 +58,7 @@ def test_register_username_exists():
 def test_register_invalid_data():
     response = client.post(
         '/api/register',
-        json={'username': '', 'password': '123'},
+        data={'username': '', 'password': '123'},
     )
     assert response.status_code == 400
     assert response.json() == {'code': 400, 'message': '用户名和邮箱不能同时为空', 'data': None}

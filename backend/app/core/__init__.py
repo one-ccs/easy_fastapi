@@ -13,7 +13,6 @@ from .yaml import (
     dump_yaml,
     read_yaml,
     write_yaml,
-    read_yaml_config,
 )
 from . import config
 from .authorize import (
@@ -47,7 +46,6 @@ __all__ = [
     'dump_yaml',
     'read_yaml',
     'write_yaml',
-    'read_yaml_config',
 
     'config',
 

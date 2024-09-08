@@ -22,6 +22,6 @@ from app.routers import user_router
 from app.routers import role_router
 
 
-app.include_router(authorization_router, prefix='/api', tags=['用户认证'])
-app.include_router(user_router, prefix='/api/user', tags=['用户'])
-app.include_router(role_router, prefix='/api/role', tags=['角色'])
+app.include_router(authorization_router, prefix='', tags=['用户认证'])
+app.include_router(user_router, prefix='/user', tags=['用户'])
+app.include_router(role_router, prefix='/role', tags=['角色'])

@@ -10,6 +10,7 @@ from sqlmodel import SQLModel, Session, create_engine, select
 from pydantic import BaseModel, Field, PrivateAttr
 
 from . import config
+from .exceptions import NotFoundException
 
 
 engine = create_engine(config.DATABASE_URI)
@@ -104,24 +105,29 @@ class BaseCRUD(SQLModel):
 
     @classmethod
     def by_id(cls, id: int = Field(..., gt=0)) -> Optional[Self]:
-        return cls.query(cls.id == id).first()
+        obj = cls.query(cls.id == id).first()
+        if obj is None:
+            raise NotFoundException('对象不存在')
+        return obj
 
     @classmethod
     def delete(cls) -> Self:
         """删除当前查询语句的结果"""
         obj = cls.first()
+        if obj is None:
+            raise NotFoundException('删除失败')
         cls._session.delete(obj)
         cls._session.commit()
         return obj
 
     @classmethod
-    def delete_all(cls) -> Sequence[Self]:
+    def delete_all(cls) -> int:
         """删除当前查询语句的所有结果"""
         objs = cls.all()
         for obj in objs:
             cls._session.delete(obj)
         cls._session.commit()
-        return objs
+        return len(objs)
 
     @classmethod
     def create(cls, source: dict | SQLModel | BaseModel) -> Self:

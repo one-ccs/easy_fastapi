@@ -1,12 +1,13 @@
 # 项目配置文件
 # 请在此文件中配置项目相关信息，如数据库连接信息、安全认证配置、日志配置等
+# 带 * 号表示必选项
 
 easy_fastapi:
     # 是否强制所有除 500 外的状态码都返回 200 状态码，默认 False
     force_200_code: False
     # 安全认证配置
     authorization:
-        # 密钥，默认 None
+        # * 密钥，默认 None
         secret_key: easy_fastapi
         # 算法，默认 HS256
         algorithm: HS256
@@ -17,7 +18,7 @@ easy_fastapi:
     # 路径相关配置
     resources:
         # 上传文件保存目录
-        upload_folder: ../upload
+        upload_folder: ./upload
         # 模板文件目录
         templates_folder: ../frontend/dist
         # 静态文件目录
@@ -25,6 +26,8 @@ easy_fastapi:
 
 
 fastapi:
+    # root_path，默认 /api
+    root_path: /api
     # 跨域配置
     cors:
         # 是否启用跨域，默认 False
@@ -59,14 +62,17 @@ fastapi:
 
 # 数据库配置
 database:
+    # *
     url: mysql://127.0.0.1:3306/easy_fastapi
+    # *
     username: root
+    # *
     password: 123456
 
 
 # redis 配置
 redis:
-    # 主机名，默认 None
+    # * 主机名，默认 None
     host: 127.0.0.1
     # 密码，默认 None
     password: ~

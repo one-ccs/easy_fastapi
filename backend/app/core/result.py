@@ -104,7 +104,7 @@ class Result(object):
 
         if data_type is None:
             name = 'Result'
-        elif data_type.__class__ is type:
+        elif data_type.__class__ is type or class_name:
             name = f'Result{class_name}'
         else:
             name = f'Result{data_type.__name__}'
