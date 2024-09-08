@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pydantic import BaseModel, ConfigDict
 from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 from app.utils import DateTimeUtil
 from .role_schema import Role
 
 
 class UserBase(BaseModel):
-    email: str | None = None
+    email: EmailStr | None = None
     username: str | None = None
 
 

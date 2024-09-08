@@ -29,7 +29,7 @@ from .authorize import (
     get_current_user,
     get_current_refresh_user,
 )
-from .db import get_db
+from .db import BaseCRUD, create_db_and_tables, get_session
 from .redis import redis_conn
 from .result import JSONResponseResult, Result
 
@@ -63,7 +63,9 @@ __all__ = [
     'get_current_user',
     'get_current_refresh_user',
 
-    'get_db',
+    'BaseCRUD',
+    'create_db_and_tables',
+    'get_session',
 
     'redis_conn',
 

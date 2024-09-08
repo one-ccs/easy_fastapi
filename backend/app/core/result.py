@@ -110,7 +110,7 @@ class Result(object):
             name = f'Result{data_type.__name__}'
 
         bases = (BaseModel,)
-        attr = {
+        namespace = {
             '__annotations__': {
                 'code': int,
                 'message': str,
@@ -118,4 +118,4 @@ class Result(object):
             },
         }
 
-        return type(name, bases, attr)
+        return type(name, bases, namespace)

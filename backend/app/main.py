@@ -1,12 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from fastapi import FastAPI, Request, Response
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Request, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from app.core import config
+from app.core import config, create_db_and_tables, get_session
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 启动事件
+    create_db_and_tables()
+    yield
+    # 关闭事件
+    pass
 
 
 app = FastAPI(
@@ -21,6 +32,9 @@ app = FastAPI(
         'name': '开源协议：MIT',
         'url': 'https://github.com/one-ccs/easy_fastapi?tab=MIT-1-ov-file#readme',
     },
+    dependencies=[
+        Depends(get_session),
+    ],
 )
 
 if config.CORS_ENABLED:

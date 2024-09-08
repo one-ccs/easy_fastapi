@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends
-from sqlmodel import Session
+from fastapi import APIRouter
 
 from app.core import (
     TokenData,
-    get_db,
     get_current_user,
 )
 from app.services import role_service

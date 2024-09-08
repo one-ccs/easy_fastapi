@@ -20,7 +20,7 @@ from app import app
 @app.exception_handler(Exception)
 async def server_exception_handler(request: Request, exc: Exception):
     logger.warning(msg=f"服务器错误", exc_info=exc)
-    return JSONResponseResult.failure('服务器错误，请联系管理员')
+    return JSONResponseResult('服务器错误，请联系管理员', code=500)
 
 
 ################## HTTP 异常 ##################

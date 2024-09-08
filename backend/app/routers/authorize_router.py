@@ -4,12 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session
 
 from app.core import (
     Result,
     TokenData,
-    get_db,
     require_token,
     get_current_refresh_user,
 )
@@ -27,9 +25,8 @@ authorization_router = APIRouter()
     response_model=Result.of(schemas.UserLogin))
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db),
 ):
-    return await authorize_service.login(form_data, db)
+    return await authorize_service.login(form_data)
 
 
 @authorization_router.post(
@@ -50,9 +47,8 @@ async def refresh(
     response_model=Result.of(schemas.Register))
 async def register(
     form_data: schemas.UserCreate,
-    db: Session = Depends(get_db),
 ):
-    return await authorize_service.register(form_data, db)
+    return await authorize_service.register(form_data)
 
 
 @authorization_router.post(

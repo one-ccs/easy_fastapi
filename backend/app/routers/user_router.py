@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Depends
-from sqlmodel import Session
 
 from app.core import (
     Result,
     TokenData,
-    get_db,
     get_current_user,
 )
 from app.services import user_service
@@ -20,18 +18,16 @@ user_router = APIRouter()
 async def get(
     user_id: int,
     current_user: TokenData = Depends(get_current_user),
-    db: Session = Depends(get_db),
 ):
-    return await user_service.get(user_id, db)
+    return await user_service.get(user_id)
 
 
 @user_router.put('', summary='添加用户', response_model=Result.of(schemas.UserInfo))
 async def add(
     user: schemas.UserCreate,
     current_user: TokenData = Depends(get_current_user),
-    db: Session = Depends(get_db)
 ):
-    return await user_service.add(user, db)
+    return await user_service.add(user)
 
 
 @user_router.post('', summary='修改用户')
@@ -59,6 +55,5 @@ async def page(
 async def get_user_roles(
     user_id: int,
     current_user: TokenData = Depends(get_current_user),
-    db: Session = Depends(get_db),
 ):
-    return await user_service.get_user_roles(user_id, db)
+    return await user_service.get_user_roles(user_id)

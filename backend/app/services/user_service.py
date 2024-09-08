@@ -1,21 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from sqlmodel import Session
+from sqlmodel import or_
 
-from app.core import TODOException, FailureException, Result
+from app.core import (
+    TODOException,
+    FailureException,
+    Result,
+    encrypt_password,
+)
 from app import models, schemas
 
 
-async def get(user_id: int, db: Session):
-    db_user = models.crud.get_user(db, user_id)
+async def get(user_id: int):
+    db_user = models.User.by_id(user_id)
     return Result(data=db_user)
 
 
-async def add(user: schemas.UserCreate, db: Session):
-    db_user = models.crud.get_user_by_email(db, user.email)
+async def add(user: schemas.UserCreate):
+    db_user = models.User.by_username(user.username)
     if db_user:
-        raise FailureException('已存在该邮箱地址')
-    db_user = models.crud.create_user(db, user)
+        raise FailureException('用户名已存在')
+
+    db_user = models.User.by_email(user.email)
+    if db_user:
+        raise FailureException('邮箱已存在')
+
+    db_user = models.User.create(user)
+    db_user.hashed_password = encrypt_password(user.password)
+    db_user.save_or_update()
+    # TODO 设置默认角色
     return Result(data=db_user)
 
 
@@ -31,6 +44,6 @@ async def page():
     raise TODOException()
 
 
-async def get_user_roles(user_id: int, db: Session):
-    db_roles = models.crud.get_user_roles(db, user_id)
+async def get_user_roles(user_id: int):
+    db_roles = models.User.get_roles(user_id)
     return Result(data=db_roles)
