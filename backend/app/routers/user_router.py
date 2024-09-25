@@ -46,11 +46,12 @@ async def delete(
     return await user_service.delete(ids)
 
 
-@user_router.get('/page', summary='获取用户列表')
+@user_router.get('/page', summary='获取用户列表', response_model=Result.of(schemas.PageQueryOut[schemas.UserInfo]))
 async def page(
+    page_query: schemas.PageQueryIn,
     current_user: TokenData = Depends(get_current_user),
 ):
-    return await user_service.page()
+    return await user_service.page(page_query)
 
 
 @user_router.get('/roles', summary='获取用户角色', response_model=Result.of(list[schemas.Role], class_name='Roles'))

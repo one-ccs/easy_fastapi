@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
+from .role import Role
 from app.utils import DateTimeUtil
-from .role_schema import Role
 
 
 class UserBase(BaseModel):

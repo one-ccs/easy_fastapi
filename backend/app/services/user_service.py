@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from sqlmodel import or_
+
 from app.core import (
-    TODOException,
     FailureException,
     Result,
     encrypt_password,
@@ -50,8 +51,15 @@ async def delete(ids: list[int]):
     return Result(data=count)
 
 
-async def page():
-    raise TODOException()
+async def page(page_query: schemas.PageQueryIn):
+    db_users = models.User.query(
+        or_(
+            models.User.username.contains(page_query.query),
+            models.User.email.contains(page_query.query),
+        ),
+    ).page(page_query.page, page_query.size)
+
+    return Result(data=db_users)
 
 
 async def get_user_roles(id: int):

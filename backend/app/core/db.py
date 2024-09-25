@@ -34,16 +34,18 @@ class BaseCRUD(SQLModel):
     @classmethod
     def statement(cls) -> SelectOfScalar[_TSelectParam]:
         """返回当前的查询语句"""
-        if cls._session._statement is None:
-            raise Exception('CRUD Error: 请先调用 query 方法')
-        return cls._session._statement
+        try:
+            return cls._session._statement
+        except AttributeError:
+            raise AttributeError('CRUD Error: 请先调用 query 方法')
 
     @classmethod
     def query(cls, *whereclause: _ColumnExpressionArgument[bool] | bool) -> Union['BaseCRUD', Self]:
         """添加查询条件，并初始化查询语句"""
-        if cls._session is None:
-            raise Exception('CRUD Error: 请先调用 get_session 方法')
-        cls._session._statement = select(cls).where(*whereclause)
+        try:
+            cls._session._statement = select(cls).where(*whereclause)
+        except AttributeError:
+            raise AttributeError('CRUD Error: 请先调用 get_session 方法')
         return cls
 
     @classmethod
@@ -61,7 +63,7 @@ class BaseCRUD(SQLModel):
     @classmethod
     def count(cls) -> int:
         """返回查询结果的条数"""
-        return cls._session.exec(cls.statement()).all().count()
+        return len(cls._session.exec(cls.statement()).all())
 
     @classmethod
     def first(cls) -> Optional[Self]:

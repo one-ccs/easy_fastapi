@@ -4,6 +4,7 @@ from typing import Any
 from pathlib import Path
 from datetime import timedelta
 
+from .logger import logger
 from .yaml import read_yaml
 from app.utils import ObjectUtil, PathUtil
 
@@ -84,6 +85,9 @@ if not SECRET_KEY:
 
 if not REDIS_HOST:
     raise ValueError(f'配置文件 "{CONFIG_PATH}" 缺少 "easy_fastapi.redis.host" 配置')
+
+if SECRET_KEY in ('easy_fastapi', '123456', 'pass'):
+    logger.warning(f'配置文件 "{CONFIG_PATH}" 设置项 "easy_fastapi.authorization.secret_key={SECRET_KEY}" 不安全，请修改为更安全的秘钥。')
 
 
 DATABASE_URI: str = DATABASE_URL.replace('://', f'://{DATABASE_USER}:{DATABASE_PASSWORD}@')

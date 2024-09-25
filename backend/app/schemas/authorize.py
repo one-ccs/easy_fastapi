@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from fastapi import Form
 from pydantic import BaseModel, ConfigDict, EmailStr
 
-from .user_schema import UserInfo
+from .user import UserInfo
 from app.utils import DateTimeUtil
 
 
