@@ -12,6 +12,9 @@ from app import schemas, models
 
 async def get(id: int):
     db_user = models.User.by_id(id)
+    if not db_user:
+        raise FailureException('用户不存在')
+
     return Result(data=db_user)
 
 
@@ -35,6 +38,9 @@ async def add(user: schemas.UserCreate):
 
 async def modify(user: schemas.UserModify):
     db_user = models.User.by_id(user.id)
+    if not db_user:
+        raise FailureException('用户不存在')
+
     db_user.sqlmodel_update(user.model_dump(exclude={'id'}, exclude_unset=True))
 
     if user.password:

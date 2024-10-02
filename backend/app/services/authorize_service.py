@@ -17,18 +17,19 @@ from app import schemas, models
 
 
 async def login(form_data: OAuth2PasswordRequestForm):
-    user = models.User.by_username_or_email(form_data.username)
-    if not user:
+    db_user = models.User.by_username_or_email(form_data.username)
+
+    if not db_user:
         raise FailureException('用户名或邮箱不存在')
 
-    if not verify_password(form_data.password, user.hashed_password):
+    if not verify_password(form_data.password, db_user.hashed_password):
         raise FailureException('密码错误')
 
     access_token = create_access_token(sub=form_data.username)
     refresh_token = create_refresh_token(sub=form_data.username)
 
     return Result('登录成功', data={
-        'user_info': user,
+        'user_info': db_user,
         'token_type': 'bearer',
         'access_token': access_token,
         'refresh_token': refresh_token,

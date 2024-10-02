@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from typing_extensions import Self
-from typing import Union, Optional, Sequence
+from typing import Type, Optional, Sequence
+from abc import ABC
 
 from sqlalchemy.sql._typing import _JoinTargetArgument, _OnClauseArgument
 from sqlmodel.sql.expression import SelectOfScalar, _ColumnExpressionArgument
 from sqlmodel.orm.session import _TSelectParam
 from sqlmodel import SQLModel, Session, create_engine, select
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field
 
 from . import config
 from .exceptions import NotFoundException
@@ -22,62 +23,80 @@ def create_db_and_tables():
 
 def get_session():
     with Session(engine) as session:
-        BaseCRUD._session = session
         yield session
-    BaseCRUD._session = None
 
 
-class BaseCRUD(SQLModel):
+class SessionStatement(ABC):
 
-    _session: Session = PrivateAttr(None)
-
-    @classmethod
-    def statement(cls) -> SelectOfScalar[_TSelectParam]:
-        """返回当前的查询语句"""
-        try:
-            return cls._session._statement
-        except AttributeError:
-            raise AttributeError('CRUD Error: 请先调用 query 方法')
+    def __init__(self, cls, *whereclause: _ColumnExpressionArgument[bool] | bool):
+        self.cls = cls
+        self.session: Session = Session(engine)
+        self.statement: SelectOfScalar[_TSelectParam] = select(cls).where(*whereclause)
 
     @classmethod
-    def query(cls, *whereclause: _ColumnExpressionArgument[bool] | bool) -> Union['BaseCRUD', Self]:
-        """添加查询条件，并初始化查询语句"""
-        try:
-            cls._session._statement = select(cls).where(*whereclause)
-        except AttributeError:
-            raise AttributeError('CRUD Error: 请先调用 get_session 方法')
-        return cls
+    def create(cls: Type[Self] | SQLModel, source: dict | SQLModel | BaseModel) -> Self:
+        """从 course 数据模型初始化一个对象"""
+        return cls.model_validate(source)
 
     @classmethod
-    def join(cls,
+    def by_id(cls, id: int = Field(..., gt=0)) -> Optional[Self]:
+        """通过主键 id 查询对象
+
+        Args:
+            id (int, optional): 主键 id. Defaults to Field(..., gt=0).
+
+        Returns:
+            Self: 查询结果对象
+        """
+        return SessionStatement(cls, cls.id == id).first()
+
+    @classmethod
+    def query(cls, *whereclause: _ColumnExpressionArgument[bool] | bool) -> Self:
+        """新建一个查询对象
+
+        Args:
+            *whereclause (_ColumnExpressionArgument[bool] | bool): 查询条件
+
+        Returns:
+            SessionStatement: 查询对象
+        """
+        return SessionStatement(cls, *whereclause)
+
+    def join(self,
         target: _JoinTargetArgument,
         onclause: Optional[_OnClauseArgument] = None,
         *,
         isouter: bool = False,
         full: bool = False,
-    ) -> Union['BaseCRUD', Self]:
-        """查询中添加 join 语句"""
-        cls._session._statement = cls.statement().join(target, onclause, isouter=isouter, full=full)
-        return cls
+    ) -> Self:
+        """多表查询
 
-    @classmethod
-    def count(cls) -> int:
+        Args:
+            target (_JoinTargetArgument): 要加入的目标表
+            onclause (Optional[_OnClauseArgument], optional): 连接条件. Defaults to None.
+            isouter (bool, optional): 如果为 True，则使用 LEFT OUTER 连接. Defaults to False.
+            full (bool, optional): 如果为 True，则使用 FULL OUTER 连接. Defaults to False.
+
+        Returns:
+            Self: 查询对象
+        """
+        self.statement = self.statement.join(target, onclause, isouter=isouter, full=full)
+        return self
+
+    def count(self) -> int:
         """返回查询结果的条数"""
-        return len(cls._session.exec(cls.statement()).all())
+        return len(self.session.exec(self.statement).all())
 
-    @classmethod
-    def first(cls) -> Optional[Self]:
+    def first(self) -> Optional[Self]:
         """返回第一条查询结果"""
-        return cls._session.exec(cls.statement()).first()
+        return self.session.exec(self.statement).first()
 
-    @classmethod
-    def all(cls) -> Sequence[Self]:
+    def all(self) -> Sequence[Self]:
         """返回所有查询结果"""
-        return cls._session.exec(cls.statement()).all()
+        return self.session.exec(self.statement).all()
 
-    @classmethod
     def page(
-        cls,
+        self,
         page_index: int = Field(1, gt=0),
         page_size: int = Field(10, gt=0),
     ) -> dict[str, int | Sequence[Self] | bool]:
@@ -94,52 +113,54 @@ class BaseCRUD(SQLModel):
                 'finished': 是否是最后一页
             }
         """
-        total = cls.count()
+        total = self.count()
         offset = (page_index - 1) * page_size
 
-        cls._session._statement = cls.statement().offset(offset).limit(page_size)
+        self.statement = self.statement.offset(offset).limit(page_size)
 
         return {
             'total': total,
-            'items': cls.all(),
+            'items': self.all(),
             'finished': total <= offset + page_size,
         }
 
-    @classmethod
-    def by_id(cls, id: int = Field(..., gt=0)) -> Optional[Self]:
-        obj = cls.query(cls.id == id).first()
+
+    def delete(self) -> Self:
+        """删除当前查询语句的结果
+
+        Raises:
+            NotFoundException: 删除失败，对象不存在
+
+        Returns:
+            Self: 删除的对象
+        """
+        obj = self.first()
         if obj is None:
-            raise NotFoundException('对象不存在')
+            raise NotFoundException('删除失败，对象不存在')
+        self.session.delete(obj)
+        self.session.commit()
         return obj
 
-    @classmethod
-    def delete(cls) -> Self:
-        """删除当前查询语句的结果"""
-        obj = cls.first()
-        if obj is None:
-            raise NotFoundException('删除失败')
-        cls._session.delete(obj)
-        cls._session.commit()
-        return obj
+    def delete_all(self) -> int:
+        """删除当前查询语句的所有结果
 
-    @classmethod
-    def delete_all(cls) -> int:
-        """删除当前查询语句的所有结果"""
-        objs = cls.all()
+        Returns:
+            int: 删除数量
+        """
+        objs = self.all()
         for obj in objs:
-            cls._session.delete(obj)
-        cls._session.commit()
+            self.session.delete(obj)
+        self.session.commit()
         return len(objs)
 
-    @classmethod
-    def create(cls, source: dict | SQLModel | BaseModel) -> Self:
-        """从 course 数据模型初始化一个对象"""
-        return cls.model_validate(source)
-
     def save_or_update(self) -> Self:
-        """插入或更新一条记录"""
-        BaseCRUD._session.add(self)
-        BaseCRUD._session.commit()
-        BaseCRUD._session.refresh(self)
+        """保存或更新当前对象
 
+        Returns:
+            Self: 更新后的当前对象
+        """
+        with Session(engine) as session:
+            session.add(self)
+            session.commit()
+            session.refresh(self)
         return self

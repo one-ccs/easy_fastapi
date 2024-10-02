@@ -8,11 +8,11 @@ from pydantic import EmailStr
 
 from .rel_user_role import RelUserRole
 from .role import Role
-from app.core import BaseCRUD
+from app.core import SessionStatement
 from app.utils import DateTimeUtil
 
 
-class User(BaseCRUD, SQLModel, table=True):
+class User(SQLModel, SessionStatement, table=True):
     __tablename__ = 'user'
 
     id: int | None          = Field(None, primary_key=True)

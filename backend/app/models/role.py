@@ -3,10 +3,10 @@
 from sqlmodel import SQLModel, Field, Relationship
 
 from .rel_user_role import RelUserRole
-from app.core import BaseCRUD
+from app.core import SessionStatement
 
 
-class Role(BaseCRUD, SQLModel, table=True):
+class Role(SQLModel, SessionStatement, table=True):
     __tablename__ = 'role'
 
     id: int | None          = Field(None, primary_key=True)

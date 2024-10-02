@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from typing import Callable
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, Response, Depends
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from app.core import config, create_db_and_tables, get_session
+from app.core import config, create_db_and_tables
 
 
 @asynccontextmanager
@@ -33,9 +34,6 @@ app = FastAPI(
         'name': '开源协议：MIT',
         'url': 'https://github.com/one-ccs/easy_fastapi?tab=MIT-1-ov-file#readme',
     },
-    dependencies=[
-        Depends(get_session),
-    ],
 )
 
 if config.CORS_ENABLED:
@@ -65,7 +63,7 @@ if config.GZIP_ENABLED:
 
 
 @app.middleware('http')
-async def response_status_code_middleware(request: Request, call_next) -> Response:
+async def response_status_code_middleware(request: Request, call_next: Callable[[Request], Response]) -> Response:
     response: Response = await call_next(request)
 
     if config.FORCE_200_CODE:
