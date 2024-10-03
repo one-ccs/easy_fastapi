@@ -4,6 +4,7 @@ import jwt
 from starlette.exceptions import HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi import Request
+from pydantic import ValidationError
 
 from .exceptions import (
     TODOException,
@@ -45,6 +46,14 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
+    method = request.scope["method"]
+    path = request.scope["path"]
+    logger.info(msg=f"'{method} {path}' 请求参数有误 {exc.errors()}")
+    return JSONResponseResult.failure('请求参数有误')
+
+
+@app.exception_handler(ValidationError)
+async def validation_exception_handler(request: Request, exc: ValidationError):
     method = request.scope["method"]
     path = request.scope["path"]
     logger.info(msg=f"'{method} {path}' 请求参数有误 {exc.errors()}")

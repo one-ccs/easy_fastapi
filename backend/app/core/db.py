@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from typing_extensions import Self
 from typing import Type, Optional, Sequence
-from abc import ABC
 
 from sqlalchemy.sql._typing import _JoinTargetArgument, _OnClauseArgument
 from sqlmodel.sql.expression import SelectOfScalar, _ColumnExpressionArgument
@@ -26,12 +25,29 @@ def get_session():
         yield session
 
 
-class SessionStatement(ABC):
+class SessionStatement():
 
     def __init__(self, cls, *whereclause: _ColumnExpressionArgument[bool] | bool):
-        self.cls = cls
-        self.session: Session = Session(engine)
-        self.statement: SelectOfScalar[_TSelectParam] = select(cls).where(*whereclause)
+        self._session = None
+        self._statement = select(cls).where(*whereclause)
+
+    @property
+    def session(self):
+        if not hasattr(self, '_session'):
+            setattr(self, '_session', None)
+
+        if self._session is None:
+            self._session = Session(engine)
+
+        return self._session
+
+    @property
+    def statement(self) -> SelectOfScalar[_TSelectParam]:
+        return self._statement
+
+    @statement.setter
+    def statement(self, statement: SelectOfScalar[_TSelectParam]):
+        self._statement = statement
 
     @classmethod
     def create(cls: Type[Self] | SQLModel, source: dict | SQLModel | BaseModel) -> Self:
@@ -159,8 +175,7 @@ class SessionStatement(ABC):
         Returns:
             Self: 更新后的当前对象
         """
-        with Session(engine) as session:
-            session.add(self)
-            session.commit()
-            session.refresh(self)
+        self.session.add(self)
+        self.session.commit()
+        self.session.refresh(self)
         return self
