@@ -22,6 +22,12 @@ class UserInfo(UserBase):
     created_at: datetime
     roles: list[Role] = []
 
+    model_config = ConfigDict(
+        json_encoders={
+            datetime: lambda v: DateTimeUtil.strftime(v),
+        }
+    )
+
 
 class UserModify(UserBase):
     id: int
@@ -35,10 +41,3 @@ class UserLogin(BaseModel):
     token_type: str
     access_token: str
     refresh_token: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={
-            datetime: lambda v: DateTimeUtil.strftime(v),
-        },
-    )

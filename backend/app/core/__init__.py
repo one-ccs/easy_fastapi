@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import sys
+sys.path.append(__file__[:__file__.index('backend') + len('backend')])
+
 from .logger import logger
 from .exceptions import (
     TODOException,
@@ -28,7 +31,7 @@ from .authorize import (
     get_current_user,
     get_current_refresh_user,
 )
-from .db import SessionStatement, create_db_and_tables, get_session
+from .db import TORTOISE_ORM, init_tortoise, generate_schemas
 from .redis import redis_conn
 from .result import JSONResponseResult, Result
 
@@ -61,9 +64,9 @@ __all__ = [
     'get_current_user',
     'get_current_refresh_user',
 
-    'SessionStatement',
-    'create_db_and_tables',
-    'get_session',
+    'TORTOISE_ORM',
+    'init_tortoise',
+    'generate_schemas',
 
     'redis_conn',
 

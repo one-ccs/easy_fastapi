@@ -12,6 +12,14 @@ T = TypeVar('T')
 
 class ObjectUtil(object):
 
+    class MagicClass(object):
+
+        def __str__(self):
+            return ObjectUtil.repr(self)
+
+        def __call__(self, ) -> dict:
+            return ObjectUtil.vars(self)
+
     @staticmethod
     def repr(obj: object, ignore=[]) -> str:
         """将对象转为描述属性的字符串
@@ -20,7 +28,7 @@ class ObjectUtil(object):
         :return 对象详情字符串
         """
         class_name = obj.__class__.__name__
-        attributes = [f'{k}={v}' for k, v in obj.__dict__.items() if k not in ignore]
+        attributes = [f'{k}={v}' for k, v in obj.__dict__.items() if k not in ignore and not k.startswith('_')]
         attributes_str = ', '.join(attributes)
         return f'{class_name}({attributes_str})'
 
@@ -39,9 +47,9 @@ class ObjectUtil(object):
             dict_items = obj.__dict__.items()
 
         if style == 'snake':
-            return { StringUtil.camel_to_snake(k): v for k, v in dict_items if k not in ignore }
+            return { StringUtil.camel_to_snake(k): v for k, v in dict_items if k not in ignore and not k.startswith('_') }
         if style == 'camel':
-            return { StringUtil.snake_to_camel(k): v for k, v in dict_items if k not in ignore }
+            return { StringUtil.snake_to_camel(k): v for k, v in dict_items if k not in ignore and not k.startswith('_') }
         return { k: v for k, v in dict_items if k not in ignore }
 
     @staticmethod

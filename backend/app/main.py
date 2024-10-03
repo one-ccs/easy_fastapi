@@ -9,13 +9,15 @@ from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from app.core import config, create_db_and_tables
+from app.core import config, init_tortoise
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 启动事件
-    create_db_and_tables()
+
+    # 初始化数据库（仅在第一次启动时调用）
+    await init_tortoise()
     yield
     # 关闭事件
     pass
@@ -34,6 +36,7 @@ app = FastAPI(
         'name': '开源协议：MIT',
         'url': 'https://github.com/one-ccs/easy_fastapi?tab=MIT-1-ov-file#readme',
     },
+    lifespan=lifespan,
 )
 
 if config.CORS_ENABLED:

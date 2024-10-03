@@ -1,50 +1,42 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from typing import Optional
-from datetime import datetime
+from tortoise import Model, fields
+from tortoise.expressions import Q
 
-from sqlmodel import SQLModel, Field, Relationship, or_
-from pydantic import EmailStr
-
-from .rel_user_role import RelUserRole
-from .role import Role
-from app.core import SessionStatement
-from app.utils import DateTimeUtil
+from app.utils import ObjectUtil
 
 
-class User(SQLModel, SessionStatement, table=True):
-    __tablename__ = 'user'
+class User(Model, ObjectUtil.MagicClass):
+    """用户表"""
 
-    id: int | None          = Field(None, primary_key=True)
-    email: EmailStr | None  = Field(None, unique=True, index=True, max_length=64)
-    username: str | None    = Field(None, unique=True, index=True, max_length=32)
-    hashed_password: str | None = Field(None, max_length=64)
-    token: str | None       = Field(None, max_length=64)
-    avatar_url: str | None  = Field(None, max_length=256)
-    is_active: bool | None  = Field(True)
-    created_at: datetime    = Field(default_factory=DateTimeUtil.now)
+    id              = fields.IntField(primary_key=True)
+    email           = fields.CharField(max_length=64, null=True, unique=True, index=True)
+    username        = fields.CharField(max_length=32, null=True, unique=True, index=True)
+    hashed_password = fields.CharField(max_length=64)
+    token           = fields.CharField(max_length=255, null=True)
+    avatar_url      = fields.CharField(max_length=256, null=True)
+    is_active       = fields.BooleanField(default=True)
+    created_at      = fields.DatetimeField(auto_now_add=True)
 
-    roles: list[Role]       = Relationship(back_populates='users', link_model=RelUserRole)
+    roles           = fields.ManyToManyField('models.Role', related_name='users')
 
     @staticmethod
-    def by_username(username: str) -> Optional['User']:
-        return User.query(User.username == username).first()
+    async def by_id(id: int):
+        return await User.get_or_none(id=id)
 
     @staticmethod
-    def by_email(email: str) -> Optional['User']:
-        return User.query(User.email == email).first()
+    async def by_username(username: str):
+        return await User.filter(username=username).first()
 
     @staticmethod
-    def by_username_or_email(username_or_email: str) -> Optional['User']:
-        return User.query(
-            or_(
-                User.username == username_or_email,
-                User.email == username_or_email,
-            ),
+    async def by_email(email: str):
+        return await User.filter(email=email).first()
+
+    @staticmethod
+    async def by_username_or_email(username_or_email: str):
+        return await User.filter(
+            Q(username=username_or_email) | Q(email=username_or_email),
         ).first()
 
-    @staticmethod
-    def get_roles(id: int) -> list[Role]:
-        return Role.query(RelUserRole.user_id == id) \
-            .join(RelUserRole) \
-            .all()
+    async def get_roles(self):
+        return await self.roles.all()

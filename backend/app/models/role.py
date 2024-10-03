@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from sqlmodel import SQLModel, Field, Relationship
+from enum import Enum
 
-from .rel_user_role import RelUserRole
-from app.core import SessionStatement
+from tortoise import Model, fields
+
+from app.utils import ObjectUtil
 
 
-class Role(SQLModel, SessionStatement, table=True):
-    __tablename__ = 'role'
+class EnumRole(str, Enum):
+    guest = 'guest'
+    user = 'user'
+    admin = 'admin'
 
-    id: int | None          = Field(None, primary_key=True)
-    role: str | None        = Field(None, max_length=16, unique=True)
-    role_desc: str | None   = Field(None, max_length=32)
 
-    users: list['User']     = Relationship(back_populates='roles', link_model=RelUserRole) # type: ignore
+class Role(Model, ObjectUtil.MagicClass):
+    """角色表"""
+
+    id        = fields.IntField(primary_key=True)
+    role      = fields.CharEnumField(max_length=16, enum_type=EnumRole)
+    role_desc = fields.CharField(max_length=32)
