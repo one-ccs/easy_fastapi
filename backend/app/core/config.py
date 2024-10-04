@@ -45,6 +45,11 @@ STATIC_FOLDER                   = get_config('easy_fastapi.resources.static_fold
 # fastapi
 ROOT_PATH: str                  = get_config('fastapi.root_path', '/api')
 
+SWAGGER_TOKEN_URL: str          = get_config('fastapi.swagger.token_url', '/token')
+SWAGGER_DOCS_URL: str           = get_config('fastapi.swagger.docs_url', '/docs')
+SWAGGER_REDOC_URL: str          = get_config('fastapi.swagger.redoc_url', '/redoc')
+SWAGGER_OPENAPI_URL: str        = get_config('fastapi.swagger.openapi_url', '/openapi.json')
+
 CORS_ENABLED: bool              = get_config('fastapi.cors.cors_enabled', False)
 CORS_ALLOW_ORIGINS: list[str]   = get_config('fastapi.cors.cors_allow_origins', ['*'])
 CORS_ALLOW_CREDENTIALS: bool    = get_config('fastapi.cors.cors_allow_credentials', True)

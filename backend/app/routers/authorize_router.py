@@ -19,6 +19,17 @@ authorization_router = APIRouter()
 
 
 @authorization_router.post(
+    '/token',
+    summary='获取令牌',
+    description='获取令牌接口',
+    response_model=schemas.TokenOut)
+async def token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
+    return await authorize_service.token(form_data)
+
+
+@authorization_router.post(
     '/login',
     summary='登录',
     description='用户登录接口',

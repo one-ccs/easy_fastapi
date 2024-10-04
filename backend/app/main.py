@@ -16,7 +16,7 @@ from app.core import config, init_tortoise
 async def lifespan(app: FastAPI):
     # 启动事件
 
-    # 初始化数据库（仅在第一次启动时调用）
+    # 初始化数据库
     await init_tortoise()
     yield
     # 关闭事件
@@ -25,9 +25,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     root_path=config.ROOT_PATH,
+    docs_url=config.SWAGGER_DOCS_URL,
+    redoc_url=config.SWAGGER_REDOC_URL,
+    openapi_url=config.SWAGGER_OPENAPI_URL,
     title='Easy FastAPI',
-    description='基于 FastAPI 开发的后端框架，集成了 SQLModel、Pydantic、Alembic、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。',
-    version='1.3.0',
+    description='基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。',
+    version='1.8.0',
     contact={
         'name': 'one-ccs@foxmail.com',
         'email': 'one-ccs@foxmail.com',

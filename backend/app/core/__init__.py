@@ -31,7 +31,7 @@ from .authorize import (
     get_current_user,
     get_current_refresh_user,
 )
-from .db import TORTOISE_ORM, init_tortoise, generate_schemas
+from .db import ExtendedCRUD, TORTOISE_ORM, init_tortoise, generate_schemas
 from .redis import redis_conn
 from .result import JSONResponseResult, Result
 
@@ -64,6 +64,7 @@ __all__ = [
     'get_current_user',
     'get_current_refresh_user',
 
+    'ExtendedCRUD',
     'TORTOISE_ORM',
     'init_tortoise',
     'generate_schemas',

@@ -16,6 +16,25 @@ from app.core import (
 from app import schemas, models
 
 
+async def token(form_data: OAuth2PasswordRequestForm):
+    db_user = await models.User.by_username_or_email(form_data.username)
+
+    if not db_user:
+        raise FailureException('用户名或邮箱不存在')
+
+    if not verify_password(form_data.password, db_user.hashed_password):
+        raise FailureException('密码错误')
+
+    access_token = create_access_token(sub=form_data.username)
+    refresh_token = create_refresh_token(sub=form_data.username)
+
+    return {
+        'token_type': 'bearer',
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+    }
+
+
 async def login(form_data: OAuth2PasswordRequestForm):
     db_user = await models.User.by_username_or_email(form_data.username)
 
@@ -48,7 +67,7 @@ async def refresh(current_user: TokenData):
     })
 
 
-async def register(form_data: schemas.UserCreate):
+async def register(form_data: schemas.RegisterIn):
     if not form_data.username and not form_data.email:
         raise FailureException('用户名和邮箱不能同时为空')
 
@@ -59,11 +78,11 @@ async def register(form_data: schemas.UserCreate):
         raise FailureException('邮箱已存在')
 
     db_user = models.User(
-        **form_data,
+        **vars(form_data),
         hashed_password=encrypt_password(form_data.password),
     )
-    await db_user.roles.add(1)
     await db_user.save()
+    await db_user.roles.add(await models.Role.get(role='user'))
 
     return Result('注册成功', data={
         'username': db_user.username or db_user.email,

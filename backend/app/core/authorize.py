@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from typing import TypeVar
 from datetime import datetime
 
 import bcrypt
@@ -15,9 +14,7 @@ from .exceptions import ForbiddenException
 from app.utils import DateTimeUtil
 
 
-T = TypeVar('T')
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='api/login')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=config.SWAGGER_TOKEN_URL)
 
 
 class TokenData(BaseModel):

@@ -7,7 +7,7 @@ from operator import getitem
 from .string_util import StringUtil
 
 
-T = TypeVar('T')
+_T = TypeVar('_T')
 
 
 class ObjectUtil(object):
@@ -53,7 +53,7 @@ class ObjectUtil(object):
         return { k: v for k, v in dict_items if k not in ignore }
 
     @staticmethod
-    def update_with_dict(obj: T, **kw) -> T:
+    def update_with_dict(obj: _T, **kw) -> _T:
         """用关键字参数将对象赋值, 并忽略对象上不存在的属性
         :param obj 对象
         :param **kw 关键字参数

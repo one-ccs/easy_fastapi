@@ -5,7 +5,7 @@ from typing import Generic, TypeVar
 from pydantic import BaseModel
 
 
-T = TypeVar('T')
+_T = TypeVar('_T')
 
 
 class PageQueryIn(BaseModel):
@@ -14,7 +14,7 @@ class PageQueryIn(BaseModel):
     query: str | None = ''
 
 
-class PageQueryOut(BaseModel, Generic[T]):
+class PageQueryOut(BaseModel, Generic[_T]):
     total: int
-    items: list[T]
+    items: list[_T]
     finished: bool

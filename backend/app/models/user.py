@@ -3,10 +3,11 @@
 from tortoise import Model, fields
 from tortoise.expressions import Q
 
+from app.core import ExtendedCRUD
 from app.utils import ObjectUtil
 
 
-class User(Model, ObjectUtil.MagicClass):
+class User(Model, ExtendedCRUD, ObjectUtil.MagicClass):
     """用户表"""
 
     id              = fields.IntField(primary_key=True)
@@ -19,10 +20,6 @@ class User(Model, ObjectUtil.MagicClass):
     created_at      = fields.DatetimeField(auto_now_add=True)
 
     roles           = fields.ManyToManyField('models.Role', related_name='users')
-
-    @staticmethod
-    async def by_id(id: int):
-        return await User.get_or_none(id=id)
 
     @staticmethod
     async def by_username(username: str):

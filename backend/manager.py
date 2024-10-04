@@ -15,7 +15,9 @@ if __name__ == '__main__':
     run_parser.add_argument('app', nargs='?', default='app.main:app', help='应用, 默认为 "app.main:app"')
     run_parser.add_argument('-H', '--host', type=str, default='0.0.0.0', help='主机, 默认为 "0.0.0.0"')
     run_parser.add_argument('-p', '--port', type=int, default=8000, help='端口, 默认为 8000')
-    run_parser.add_argument('-r', '--reload', action='store_true', help='是否自动重启服务器')
+    run_parser.add_argument('-r', '--reload', action='store_true', help='是否自动重启服务器, 默认为 False')
+    run_parser.add_argument('--log-config', type=str, default='uvicorn_log_config.json', help='日志配置, 默认为 "uvicorn_log_config.json"')
+    run_parser.add_argument('--log-level', type=str, default='info', help='日志级别, 默认为 "info"')
 
     # database
     db_parser = subparsers.add_parser('db', help='数据库相关命令')
@@ -34,7 +36,7 @@ if __name__ == '__main__':
     if args.cmd == 'run':
         import uvicorn
 
-        uvicorn.run(args.app, host=args.host, port=args.port, reload=args.reload)
+        uvicorn.run(args.app, host=args.host, port=args.port, reload=args.reload, log_config=args.log_config, log_level=args.log_level)
     elif args.cmd == 'db':
         import os
 

@@ -28,6 +28,16 @@ easy_fastapi:
 fastapi:
     # root_path，默认 /api
     root_path: /api
+    # 文档配置
+    swagger:
+        # 用于获取访问令牌的 URL，默认 /token
+        token_url: /token
+        # 默认 /docs
+        docs_url: /api-docs
+        # 默认 /redoc
+        redoc_url: /api-redoc
+        # 默认 /openapi.json
+        openapi_url: /api-json
     # 跨域配置
     cors:
         # 是否启用跨域，默认 False

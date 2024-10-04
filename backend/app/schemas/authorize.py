@@ -10,17 +10,18 @@ from .user import UserInfo
 from app.utils import DateTimeUtil
 
 
+class TokenOut(BaseModel):
+    token_type: str
+    access_token: str
+    refresh_token: str
+
+
 class LoginOut(BaseModel):
     user_info: UserInfo
     token_type: str
     access_token: str
     refresh_token: str
 
-    model_config = ConfigDict(
-        json_encoders={
-            datetime: lambda v: DateTimeUtil.strftime(v),
-        },
-    )
 
 @dataclass
 class RegisterIn():

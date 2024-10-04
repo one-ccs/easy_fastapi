@@ -33,11 +33,11 @@ async def add(user: schemas.UserCreate):
         raise FailureException('邮箱已存在')
 
     db_user = models.User(
-        **user,
+        **user.model_dump(exclude={'password'}),
         hashed_password=encrypt_password(user.password),
     )
-    await db_user.roles.add(1)
     await db_user.save()
+    await db_user.roles.add(await models.Role.get(role='user'))
 
     return Result(data={
         **db_user(),
@@ -67,9 +67,8 @@ async def modify(user: schemas.UserModify):
 
 async def delete(ids: list[int]):
     count = await models.User.filter(id__in=ids).delete()
-    print(count)
 
-    return Result(data=0)
+    return Result(data=count)
 
 
 async def page(page_query: schemas.PageQueryIn):
