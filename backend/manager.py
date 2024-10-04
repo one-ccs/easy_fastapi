@@ -17,7 +17,7 @@ if __name__ == '__main__':
     run_parser.add_argument('-p', '--port', type=int, default=8000, help='端口, 默认为 8000')
     run_parser.add_argument('-r', '--reload', action='store_true', help='是否自动重启服务器, 默认为 False')
     run_parser.add_argument('--log-config', type=str, default='uvicorn_log_config.json', help='日志配置, 默认为 "uvicorn_log_config.json"')
-    run_parser.add_argument('--log-level', type=str, default='info', help='日志级别, 默认为 "info"')
+    run_parser.add_argument('--log-level', type=str, default='warning', help='日志级别, 默认为 "warning"')
 
     # database
     db_parser = subparsers.add_parser('db', help='数据库相关命令')
@@ -36,7 +36,18 @@ if __name__ == '__main__':
     if args.cmd == 'run':
         import uvicorn
 
-        uvicorn.run(args.app, host=args.host, port=args.port, reload=args.reload, log_config=args.log_config, log_level=args.log_level)
+        if args.reload:
+            args.log_config = None
+            args.log_level = 'info'
+
+        uvicorn.run(
+            args.app,
+            host=args.host,
+            port=args.port,
+            reload=args.reload,
+            log_config=args.log_config,
+            log_level=args.log_level,
+        )
     elif args.cmd == 'db':
         import os
 

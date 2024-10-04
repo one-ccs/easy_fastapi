@@ -8,6 +8,7 @@ dist
 logs
 **/alembic/versions/
 migrations/
+stress_testing/
 
 *.log*
 *.local

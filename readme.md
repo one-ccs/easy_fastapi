@@ -110,9 +110,12 @@ if not verify_password(form_data.password, user.hashed_password):
    3. 初始化表 `manager.py db init-table`
 5. 创建 `backend/logs` 目录
 6. 启动项目
-   - `uvicorn app:app --reload`
-   - `uvicorn app:app --reload --log-config uvicorn_log_config.json --log-level info`
-   - `manager.py run --reload`
+   - 调试
+     - `uvicorn app:app --reload`
+     - `manager.py run --reload`
+   - 生产
+     - `uvicorn app:app --log-config uvicorn_log_config.json --log-level warning`
+     - `manager.py run`
 
 ## 五、测试
 

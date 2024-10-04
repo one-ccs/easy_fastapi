@@ -18,5 +18,5 @@ class Role(Model, ExtendedCRUD, ObjectUtil.MagicClass):
     """角色表"""
 
     id        = fields.IntField(primary_key=True)
-    role      = fields.CharEnumField(max_length=16, enum_type=EnumRole)
+    role      = fields.CharEnumField(max_length=16, enum_type=EnumRole, db_index=True)
     role_desc = fields.CharField(max_length=32)

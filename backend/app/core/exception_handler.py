@@ -21,7 +21,7 @@ from app import app
 
 @app.exception_handler(Exception)
 async def server_exception_handler(request: Request, exc: Exception):
-    logger.warning(msg=f"服务器错误", exc_info=exc)
+    logger.error(msg=f"服务器错误", exc_info=exc)
     return JSONResponseResult('服务器错误，请联系管理员', code=500)
 
 
@@ -40,7 +40,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         case 405:
             return JSONResponseResult.method_not_allowed()
         case _:
-            logger.warning(msg=f"未知 HTTP 错误", exc_info=exc)
+            logger.error(msg=f"未知 HTTP 错误", exc_info=exc)
             return JSONResponseResult.failure('未知 HTTP 错误')
 
 
@@ -48,7 +48,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
     method = request.scope["method"]
     path = request.scope["path"]
-    logger.info(msg=f"'{method} {path}' 请求参数有误 {exc.errors()}")
+    logger.warning(msg=f"'{method} {path}' 请求参数有误 {exc.errors()}")
     return JSONResponseResult.failure('请求参数有误')
 
 
@@ -56,7 +56,7 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
 async def validation_exception_handler(request: Request, exc: ValidationError):
     method = request.scope["method"]
     path = request.scope["path"]
-    logger.info(msg=f"'{method} {path}' 请求参数有误 {exc.errors()}")
+    logger.warning(msg=f"'{method} {path}' 请求参数有误 {exc.errors()}")
     return JSONResponseResult.failure('请求参数有误')
 
 
@@ -85,7 +85,7 @@ async def jwt_exception_handler_4(request: Request, exc: jwt.InvalidTokenError):
 
 @app.exception_handler(jwt.PyJWTError)
 async def jwt_exception_handler_5(request: Request, exc: jwt.PyJWTError):
-    logger.warning(msg=f"未知令牌错误", exc_info=exc)
+    logger.error(msg=f"未知令牌错误", exc_info=exc)
     return JSONResponseResult.unauthorized('未知令牌错误')
 
 

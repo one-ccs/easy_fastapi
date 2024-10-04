@@ -11,8 +11,8 @@ class User(Model, ExtendedCRUD, ObjectUtil.MagicClass):
     """用户表"""
 
     id              = fields.IntField(primary_key=True)
-    email           = fields.CharField(max_length=64, null=True, unique=True, index=True)
-    username        = fields.CharField(max_length=32, null=True, unique=True, index=True)
+    email           = fields.CharField(max_length=64, null=True, unique=True, db_index=True)
+    username        = fields.CharField(max_length=32, null=True, unique=True, db_index=True)
     hashed_password = fields.CharField(max_length=64)
     token           = fields.CharField(max_length=255, null=True)
     avatar_url      = fields.CharField(max_length=256, null=True)

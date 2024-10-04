@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr, field_serializer
 
 from .role import Role
 from app.utils import DateTimeUtil
@@ -22,11 +22,10 @@ class UserInfo(UserBase):
     created_at: datetime
     roles: list[Role] = []
 
-    model_config = ConfigDict(
-        json_encoders={
-            datetime: lambda v: DateTimeUtil.strftime(v),
-        }
-    )
+
+    @field_serializer('created_at')
+    def serialize_created_at(self, value: datetime) -> str:
+        return DateTimeUtil.strftime(value)
 
 
 class UserModify(UserBase):
