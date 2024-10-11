@@ -3,10 +3,10 @@
 from typing import Any
 from pathlib import Path
 from datetime import timedelta
+from easy_pyoc import ObjectUtil, PathUtil
 
 from .logger import logger
 from .yaml import read_yaml
-from app.utils import ObjectUtil, PathUtil
 
 
 CONFIG_PATH = Path(__file__).parent.parent.joinpath('easy_fastapi.yaml')

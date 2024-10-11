@@ -7,23 +7,35 @@ import jwt
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
+from easy_pyoc import DateTimeUtil
 
 from . import config
 from .redis import redis_conn
 from .exceptions import ForbiddenException
-from app.utils import DateTimeUtil
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=config.SWAGGER_TOKEN_URL)
 
 
 class TokenData(BaseModel):
+    # 是否是刷新令牌
+    isr: bool
+    # 权限集合
+    sco: set[str] | None = None
     # 用户名
     sub: str
     # 过期时间
     exp: datetime
-    # 是否是刷新令牌
-    isr: bool
+    # 发行者
+    iss: str | None = None
+    # 接收者
+    aud: str | None = None
+    # 签发时间
+    iat: datetime | None = None
+    # 生效时间
+    nbf: datetime | None = None
+    # 唯一标识
+    jti: str | None = None
 
 
 def encrypt_password(password: str) -> str:
@@ -80,6 +92,15 @@ async def require_refresh_token(token: str = Depends(require_token)) -> str:
         raise ForbiddenException('需要刷新令牌')
 
     return token
+
+
+async def require_permission(permissions: set[str], token: str = Depends(require_token)) -> TokenData:
+    """检查用户是否具有指定的所有权限"""
+    payload = decode_token(token)
+
+    if not payload.sco or not payload.sco.issuperset(permissions):
+        raise ForbiddenException('无权访问')
+    return payload
 
 
 async def get_current_user(token: str = Depends(require_token)) -> TokenData:

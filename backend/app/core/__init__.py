@@ -18,6 +18,7 @@ from .yaml import (
     write_yaml,
 )
 from . import config
+from .generator import Generator
 from .authorize import (
     TokenData,
     encrypt_password,
@@ -51,6 +52,8 @@ __all__ = [
     'write_yaml',
 
     'config',
+
+    'Generator',
 
     'TokenData',
     'encrypt_password',

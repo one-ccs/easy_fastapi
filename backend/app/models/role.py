@@ -3,9 +3,9 @@
 from enum import Enum
 
 from tortoise import Model, fields
+from easy_pyoc import ObjectUtil
 
 from app.core import ExtendedCRUD
-from app.utils import ObjectUtil
 
 
 class EnumRole(str, Enum):

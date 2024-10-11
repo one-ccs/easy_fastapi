@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from tortoise import Model, fields
 from tortoise.expressions import Q
+from easy_pyoc import ObjectUtil
 
 from app.core import ExtendedCRUD
-from app.utils import ObjectUtil
 
 
 class User(Model, ExtendedCRUD, ObjectUtil.MagicClass):

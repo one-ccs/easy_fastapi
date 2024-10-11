@@ -3,9 +3,9 @@
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, field_serializer
+from easy_pyoc import DateTimeUtil
 
 from .role import Role
-from app.utils import DateTimeUtil
 
 
 class UserBase(BaseModel):

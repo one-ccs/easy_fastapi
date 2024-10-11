@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from dataclasses import dataclass
 
 from fastapi import Form
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr
 
 from .user import UserInfo
-from app.utils import DateTimeUtil
 
 
 class TokenOut(BaseModel):

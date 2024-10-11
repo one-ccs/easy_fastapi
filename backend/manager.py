@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # fastapi
     run_parser = subparsers.add_parser('run', help='FastAPI 相关命令')
     run_parser.add_argument('app', nargs='?', default='app.main:app', help='应用, 默认为 "app.main:app"')
-    run_parser.add_argument('-H', '--host', type=str, default='0.0.0.0', help='主机, 默认为 "0.0.0.0"')
+    run_parser.add_argument('-H', '--host', type=str, default='127.0.0.1', help='主机, 默认为 "127.0.0.1"')
     run_parser.add_argument('-p', '--port', type=int, default=8000, help='端口, 默认为 8000')
     run_parser.add_argument('-r', '--reload', action='store_true', help='是否自动重启服务器, 默认为 False')
     run_parser.add_argument('--log-config', type=str, default='uvicorn_log_config.json', help='日志配置, 默认为 "uvicorn_log_config.json"')
@@ -31,14 +31,18 @@ if __name__ == '__main__':
     db_subparsers.add_parser('init-db', help='初始化数据库')
     db_subparsers.add_parser('init-table', help='初始化表')
 
+    # generator
+    gen_parser = subparsers.add_parser('gen', help='代码生成器')
+
     args = parser.parse_args()
 
     if args.cmd == 'run':
         import uvicorn
 
         if args.reload:
-            args.log_config = None
-            args.log_level = 'info'
+            from uvicorn.config import LOGGING_CONFIG
+            args.log_config = LOGGING_CONFIG
+            args.log_level = None
 
         uvicorn.run(
             args.app,
@@ -62,5 +66,10 @@ if __name__ == '__main__':
             from app.core import generate_schemas
 
             run_async(generate_schemas())
+    elif args.cmd == 'gen':
+        from app import models
+        from app.core import Generator
+
+        Generator(models.__path__).build()
     else:
         parser.print_help()
