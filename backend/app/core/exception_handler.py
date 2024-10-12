@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import jwt
 from starlette.exceptions import HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi import Request
 from pydantic import ValidationError
+from jwt.exceptions import (
+    ExpiredSignatureError,
+    InvalidSignatureError,
+    DecodeError,
+    InvalidTokenError,
+    PyJWTError,
+)
 
 from .exceptions import (
     TODOException,
@@ -63,28 +69,28 @@ async def validation_exception_handler(request: Request, exc: ValidationError):
 ################## JWT 异常 ##################
 
 
-@app.exception_handler(jwt.ExpiredSignatureError)
-async def jwt_exception_handler_1(request: Request, exc: jwt.ExpiredSignatureError):
+@app.exception_handler(ExpiredSignatureError)
+async def jwt_exception_handler_1(request: Request, exc: ExpiredSignatureError):
     return JSONResponseResult.unauthorized('令牌已过期')
 
 
-@app.exception_handler(jwt.InvalidSignatureError)
-async def jwt_exception_handler_2(request: Request, exc: jwt.InvalidSignatureError):
+@app.exception_handler(InvalidSignatureError)
+async def jwt_exception_handler_2(request: Request, exc: InvalidSignatureError):
     return JSONResponseResult.unauthorized('无效的签名')
 
 
-@app.exception_handler(jwt.DecodeError)
-async def jwt_exception_handler_3(request: Request, exc: jwt.DecodeError):
+@app.exception_handler(DecodeError)
+async def jwt_exception_handler_3(request: Request, exc: DecodeError):
     return JSONResponseResult.unauthorized('令牌解析失败')
 
 
-@app.exception_handler(jwt.InvalidTokenError)
-async def jwt_exception_handler_4(request: Request, exc: jwt.InvalidTokenError):
+@app.exception_handler(InvalidTokenError)
+async def jwt_exception_handler_4(request: Request, exc: InvalidTokenError):
     return JSONResponseResult.unauthorized('无效的访问令牌')
 
 
-@app.exception_handler(jwt.PyJWTError)
-async def jwt_exception_handler_5(request: Request, exc: jwt.PyJWTError):
+@app.exception_handler(PyJWTError)
+async def jwt_exception_handler_5(request: Request, exc: PyJWTError):
     logger.error(msg=f"未知令牌错误", exc_info=exc)
     return JSONResponseResult.unauthorized('未知令牌错误')
 
