@@ -48,7 +48,7 @@ async def login(form_data: OAuth2PasswordRequestForm):
     refresh_token = create_refresh_token(sub=form_data.username)
 
     return Result('登录成功', data={
-        'user_info': {
+        'user': {
             **db_user(),
             'roles': await db_user.get_roles(),
         },
@@ -67,7 +67,7 @@ async def refresh(current_user: TokenData):
     })
 
 
-async def register(form_data: schemas.RegisterIn):
+async def register(form_data: schemas.Register):
     if not form_data.username and not form_data.email:
         raise FailureException('用户名和邮箱不能同时为空')
 

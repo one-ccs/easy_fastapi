@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Iterator
 from pathlib import Path
+from importlib import import_module
 import pkgutil
 
 
@@ -10,27 +11,55 @@ class Generator:
 
     根据 models 生成对应的 router 和 service 代码"""
 
-    def __init__(self, models_path: Iterator[str]):
+    def __init__(self, models_path: Iterator[str], pk_name: str = 'id', models_ignore: set[str] = {}):
         self.models_path = models_path
-        self.models = self.__get_models()
+        self.pk_name = pk_name
+        self.models_ignore = models_ignore
+
+        self.models = self.get_models()
         self.work_path = Path(models_path[0]).parent
 
-    def __get_models(self) -> list[str]:
-        return [model_name for _, model_name, _ in pkgutil.iter_modules(self.models_path)]
+    def get_models(self) -> list[str]:
+        """获取 models"""
+        return [model_name for _, model_name, _ in pkgutil.iter_modules(self.models_path) if model_name not in self.models_ignore]
 
-    def generate_router(self):
+    def get_fields_map(self, model_name: str) -> dict[str, str]:
+        """获取 model 字段"""
+        module = import_module(f'app.models.{model_name}')
+        model = getattr(module, model_name.title())
+
+        return {field: tortoise_type.field_type.__name__ for field, tortoise_type in model._meta.fields_map.items()}
+
+    def generate_schemas(self):
+        """生成 schemas 代码"""
+        for model_name in self.models:
+            file_name = f"{model_name}.py"
+            file_path = self.work_path /'schemas' / file_name
+            fields_map = self.get_fields_map(model_name)
+            base_fields = '\n    '.join(f'{k}: {v}' for k, v in fields_map.items() if k != self.pk_name)
+
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(SCHEMA_TEMPLATE.format(
+                    model_name=model_name,
+                    title_model_name=model_name.title(),
+                    base_fields=base_fields,
+                    pk_name=self.pk_name,
+                    pk_type=fields_map.get(self.pk_name, 'int'),
+                ))
+
+    def generate_routers(self):
         """生成 router 代码"""
         for model_name in self.models:
-            file_name = f"_{model_name}_router.py"
+            file_name = f"{model_name}_router.py"
             file_path = self.work_path / 'routers' / file_name
 
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(ROUTER_TEMPLATE.format(model_name=model_name, title_model_name=model_name.title()))
 
-    def generate_service(self):
+    def generate_services(self):
         """生成 service 代码"""
         for model_name in self.models:
-            file_name = f"_{model_name}_service.py"
+            file_name = f"{model_name}_service.py"
             file_path = self.work_path /'services' / file_name
 
             with open(file_path, 'w', encoding='utf-8') as f:
@@ -38,9 +67,29 @@ class Generator:
 
     def build(self):
         """构建项目"""
-        self.generate_router()
-        self.generate_service()
+        self.generate_schemas()
+        self.generate_routers()
+        self.generate_services()
 
+
+SCHEMA_TEMPLATE = """#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from pydantic import BaseModel
+
+
+class {title_model_name}Base(BaseModel):
+    {base_fields}
+
+
+class {title_model_name}({title_model_name}Base): ...
+
+
+class {title_model_name}Create({title_model_name}Base): ...
+
+
+class {title_model_name}Modify({title_model_name}Base):
+    {pk_name}: {pk_type}
+"""
 
 ROUTER_TEMPLATE = """#!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -58,7 +107,7 @@ from app import schemas
 {model_name}_router = APIRouter()
 
 
-@{model_name}_router.get('', summary='{model_name}.GET', response_model=Result.of(schemas.{title_model_name}Out))
+@{model_name}_router.get('', summary='查询 {title_model_name} 信息', response_model=Result.of(schemas.{title_model_name}))
 async def get(
     id: int,
     current_user: TokenData = Depends(get_current_user),
@@ -66,7 +115,7 @@ async def get(
     return await {model_name}_service.get(id)
 
 
-@{model_name}_router.post('', summary='{model_name}.POST', response_model=Result.of(schemas.{title_model_name}Out))
+@{model_name}_router.post('', summary='添加 {title_model_name}', response_model=Result.of(schemas.{title_model_name}))
 async def add(
     {model_name}: schemas.{title_model_name}Create,
     current_user: TokenData = Depends(get_current_user),
@@ -74,7 +123,7 @@ async def add(
     return await {model_name}_service.add({model_name})
 
 
-@{model_name}_router.put('', summary='{model_name}.PUT', response_model=Result.of(schemas.{title_model_name}Out))
+@{model_name}_router.put('', summary='修改 {title_model_name}', response_model=Result.of(schemas.{title_model_name}))
 async def modify(
     {model_name}: schemas.{title_model_name}Modify,
     current_user: TokenData = Depends(get_current_user),
@@ -82,7 +131,7 @@ async def modify(
     return await {model_name}_service.modify({model_name})
 
 
-@{model_name}_router.delete('', summary='{model_name}.DELETE', response_model=Result.of(int, class_name='{title_model_name}Out'))
+@{model_name}_router.delete('', summary='删除 {title_model_name}', response_model=Result.of(int, name='Delete'))
 async def delete(
     ids: list[int] = Query(...),
     current_user: TokenData = Depends(get_current_user),
@@ -90,13 +139,12 @@ async def delete(
     return await {model_name}_service.delete(ids)
 
 
-@{model_name}_router.get('/page', summary='{model_name}.GET.page', response_model=Result.of(schemas.PageQueryOut[schemas.{title_model_name}Out]))
+@{model_name}_router.get('/page', summary='获取 {title_model_name} 列表', response_model=Result.of(schemas.PageQueryOut[schemas.{title_model_name}]))
 async def page(
-    page_query: schemas.PageQueryIn,
+    page_query: schemas.PageQuery = Depends(),
     current_user: TokenData = Depends(get_current_user),
 ):
     return await {model_name}_service.page(page_query)
-
 """
 
 SERVICE_TEMPLATE = """#!/usr/bin/env python
@@ -149,11 +197,11 @@ async def delete(ids: list[int]):
     return Result(data=count)
 
 
-async def page(page_query: schemas.PageQueryIn):
-    db_{model_name}s = await models.{title_model_name}.filter(
-        Q(username__icontains=page_query.query) | Q(email__icontains=page_query.query),
-    ).limit(page_query.size).offset((page_query.page - 1) * page_query.size)
+async def page(page_query: schemas.PageQuery):
+    pagination = await models.{title_model_name}.paginate(
+        page_query.page,
+        page_query.size,
+    )
 
-    return Result(data=db_{model_name}s)
-
+    return Result(data=pagination)
 """

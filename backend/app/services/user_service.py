@@ -71,12 +71,21 @@ async def delete(ids: list[int]):
     return Result(data=count)
 
 
-async def page(page_query: schemas.PageQueryIn):
-    db_users = await models.User.filter(
+async def page(page_query: schemas.PageQuery):
+    pagination = await models.User.paginate(
+        page_query.page,
+        page_query.size,
         Q(username__icontains=page_query.query) | Q(email__icontains=page_query.query),
-    ).limit(page_query.size).offset((page_query.page - 1) * page_query.size)
+    )
 
-    return Result(data=db_users)
+    return Result(data={
+        'total': pagination.total,
+        'items': [{
+            **item(),
+            'roles': await item.get_roles(),
+        } for item in pagination.items],
+        'finished': pagination.finished,
+    })
 
 
 async def get_user_roles(id: int):

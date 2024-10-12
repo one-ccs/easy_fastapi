@@ -7,8 +7,9 @@ from easy_pyoc import ObjectUtil
 from app.core import ExtendedCRUD
 
 
-class User(Model, ExtendedCRUD, ObjectUtil.MagicClass):
+class User(ObjectUtil.MagicClass, ExtendedCRUD, Model):
     """用户表"""
+    _str_ignore = {'hashed_password'}
 
     id              = fields.IntField(primary_key=True)
     email           = fields.CharField(max_length=64, null=True, unique=True, db_index=True)

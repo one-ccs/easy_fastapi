@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import argparse
-
 
 if __name__ == '__main__':
+    import argparse
+
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(
         title='可选命令',
@@ -33,6 +33,8 @@ if __name__ == '__main__':
 
     # generator
     gen_parser = subparsers.add_parser('gen', help='代码生成器')
+    gen_parser.add_argument('-pk', dest='_pk', default='id', help='主键字段名, 默认为 "id"')
+    gen_parser.add_argument('-im', dest='_im', nargs='?', default='user,role', help='要忽略的模型列表, 用逗号分隔, 默认为 "user,role"')
 
     args = parser.parse_args()
 
@@ -70,6 +72,10 @@ if __name__ == '__main__':
         from app import models
         from app.core import Generator
 
-        Generator(models.__path__).build()
+        Generator(
+            models_path=models.__path__,
+            pk_name=args._pk,
+            models_ignore=set(args._im.replace(' ', '').split(',')) if args._im else {},
+        ).build()
     else:
         parser.print_help()

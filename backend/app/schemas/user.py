@@ -13,19 +13,18 @@ class UserBase(BaseModel):
     username: str | None = None
 
 
-class UserCreate(UserBase):
-    password: str
-
-
-class UserInfo(UserBase):
+class User(UserBase):
     avatar_url: str | None = None
     created_at: datetime
     roles: list[Role] = []
 
-
     @field_serializer('created_at')
     def serialize_created_at(self, value: datetime) -> str:
         return DateTimeUtil.strftime(value)
+
+
+class UserCreate(UserBase):
+    password: str
 
 
 class UserModify(UserBase):
@@ -33,10 +32,3 @@ class UserModify(UserBase):
     password: str | None = None
     avatar_url: str | None = None
     is_active: bool | None = None
-
-
-class UserLogin(BaseModel):
-    user_info: UserInfo
-    token_type: str
-    access_token: str
-    refresh_token: str

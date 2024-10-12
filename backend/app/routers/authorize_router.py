@@ -46,7 +46,7 @@ async def login(
     description='用户注册接口',
     response_model=Result.of(schemas.RegisterOut))
 async def register(
-    form_data: schemas.RegisterIn = Depends(),
+    form_data: schemas.Register = Depends(),
 ):
     return await authorize_service.register(form_data)
 
@@ -67,7 +67,7 @@ async def logout(
     '/refresh',
     summary='刷新令牌',
     description='刷新令牌接口',
-    response_model=Result.of(schemas.RefreshOut))
+    response_model=Result.of(schemas.RefreshTokenOut))
 async def refresh(
     current_user: TokenData = Depends(get_current_refresh_user),
 ):

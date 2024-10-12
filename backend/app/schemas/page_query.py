@@ -1,17 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from typing import Generic, TypeVar
+from dataclasses import dataclass
 
+from fastapi import Query
 from pydantic import BaseModel
 
 
 _T = TypeVar('_T')
 
 
-class PageQueryIn(BaseModel):
-    page: int | None = 1
-    size: int | None = 10
-    query: str | None = ''
+@dataclass
+class PageQuery():
+    page: int   = Query(1)
+    size: int   = Query(10)
+    query: str  = Query('')
 
 
 class PageQueryOut(BaseModel, Generic[_T]):

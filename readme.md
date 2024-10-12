@@ -1,6 +1,6 @@
 # Easy FastAPI
 
-基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。
+基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，并且可以在编写好 `models` 文件后执行 `manager.py gen` 命令，批量生成 `schemas`、`routers`、`services` 代码，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，大大减少了项目的前期开发工作，帮助开发者快速构建和部署后端服务。
 
 ![alt text](backend/preview/preview_1.jpeg)
 
@@ -10,6 +10,7 @@
 2. 清晰的目录结构：通过明确的目录划分，如核心配置、数据库模型、路由、数据结构、事务处理和工具函数等，使项目结构清晰，便于维护和扩展。
 3. 认证授权：内置认证授权模块，支持 JWT 认证，保障系统安全。
 4. 数据库迁移支持：利用 Alembic 进行数据库迁移，支持自动生成迁移文件和更新数据库，确保数据库结构与代码同步。
+5. 代码生成器：使用内置的代码生成器，在编写好 `models` 的前提下，意一键生成基本 CRUD 接口，大大减轻前期开发工作
 
 ## 二、目录结构说明
 
@@ -26,6 +27,7 @@ project-root/
 │   │   │   ├─ config.py            # 项目配置
 │   │   │   ├─ db.py                # 数据库配置
 │   │   │   ├─ exception_handler.py # 异常处理配置
+│   │   │   ├─ generator.py         # 代码生成器
 │   │   │   ├─ logger.py            # 日志配置
 │   │   │   ├─ redis.py             # redis 配置
 │   │   │   ├─ result.py            # 响应体数据类
@@ -103,13 +105,16 @@ if not verify_password(form_data.password, user.hashed_password):
 
 1. 安装依赖 `cd backend && pip install -r requirements.txt`
 2. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
-3. 创建数据库
-4. 初始化数据库
+3. （可选）添加或修改 `backend.app.models` 中的模型
+   1. 执行代码生成器 `manager.py gen` 生成基本业务代码
+   2. 根据实际清空添加或修改业务代码
+4. 创建数据库
+5. 初始化数据库
    1. 初始化 Aerich 配置 `manager.py db init`
    2. 初始化数据库 `manager.py db init-db`
    3. 初始化表 `manager.py db init-table`
-5. 创建 `backend/logs` 目录
-6. 启动项目
+6. 创建 `backend/logs` 目录
+7. 启动项目
    - 调试
      - `uvicorn app:app --reload`
      - `manager.py run --reload`
@@ -121,3 +126,17 @@ if not verify_password(form_data.password, user.hashed_password):
 
 1. 在 `backend/test` 目录中添加测试文件
 2. 运行 `cd backend/test && pytest` 查看测试结果
+
+## 六、manager.py
+
+项目管理文件 `manager.py` 包含了项目的管理命令，包括但不限于：
+
+- `manager.py run` 启动项目生成环境
+- `manager.py run --reload` 启动项目开发环境
+- `manager.py db init` 初始化 Aerich 配置
+- `manager.py db init-db` 初始化数据库
+- `manager.py db init-table` 初始化表
+- `manager.py db migrate` 数据库迁移
+- `manager.py db upgrade` 数据库升级
+- `manager.py db downgrade` 数据库降级
+- `manager.py gen` 生成代码

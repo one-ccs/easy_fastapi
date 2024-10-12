@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from fastapi import Form
 from pydantic import BaseModel, EmailStr
 
-from .user import UserInfo
+from .user import User
 
 
 class TokenOut(BaseModel):
@@ -15,14 +15,14 @@ class TokenOut(BaseModel):
 
 
 class LoginOut(BaseModel):
-    user_info: UserInfo
+    user: User
     token_type: str
     access_token: str
     refresh_token: str
 
 
 @dataclass
-class RegisterIn():
+class Register():
     email: EmailStr = Form(None)
     username: str   = Form(None)
     password: str   = Form()
@@ -32,6 +32,6 @@ class RegisterOut(BaseModel):
     username: str
 
 
-class RefreshOut(BaseModel):
+class RefreshTokenOut(BaseModel):
     token_type: str
     refresh_token: str

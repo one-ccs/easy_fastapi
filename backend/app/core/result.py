@@ -89,23 +89,23 @@ class Result(object):
         return cls(message, data=None, code=405)
 
     @staticmethod
-    def of(data_type: Any, *, class_name: str | None = None) -> BaseModel:
+    def of(data_type: Any, *, name: str | None = None) -> BaseModel:
         """返回结构化的 BaseModel 类
 
         Args:
             data_type (Any | None, optional): data 的数据类型. Defaults to None.
-            class_name (str, optional): 类型名称. Defaults to 'Result'.
+            name (str, optional): 类型名称. Defaults to 'Result'.
 
         Returns:
             BaseModel: 结构化的 BaseModel 类.
         """
-        if data_type.__class__ is type and not class_name:
-            raise ValueError('若 data_type 不是 BaseModel 类，则必须指定 class_name 参数')
+        if data_type.__class__ is type and not name:
+            raise ValueError('若 data_type 不是 BaseModel 类，则必须指定 name 参数')
 
         if data_type is None:
             name = 'Result'
-        elif data_type.__class__ is type or class_name:
-            name = f'Result{class_name}'
+        elif data_type.__class__ is type or name:
+            name = f'Result{name}'
         else:
             name = f'Result{data_type.__name__}'
 
