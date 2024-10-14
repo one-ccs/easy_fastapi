@@ -11,10 +11,11 @@ class Generator:
 
     根据 models 生成对应的 router 和 service 代码"""
 
-    def __init__(self, models_path: Iterator[str], pk_name: str = 'id', models_ignore: set[str] = {}):
+    def __init__(self, models_path: Iterator[str], pk_name: str = 'id', models_ignore: set[str] = {}, encoding: str = 'utf-8'):
         self.models_path = models_path
         self.pk_name = pk_name
         self.models_ignore = models_ignore
+        self.encoding = encoding
 
         self.models = self.get_models()
         self.work_path = Path(models_path[0]).parent
@@ -28,42 +29,80 @@ class Generator:
         module = import_module(f'app.models.{model_name}')
         model = getattr(module, model_name.title())
 
-        return {field: tortoise_type.field_type.__name__ for field, tortoise_type in model._meta.fields_map.items()}
+        return {
+            field: tortoise_type.field_type.__name__
+            for field, tortoise_type in model._meta.fields_map.items()
+            if tortoise_type.field_type
+        }
 
     def generate_schemas(self):
         """生成 schemas 代码"""
         for model_name in self.models:
-            file_name = f"{model_name}.py"
+            file_name = f'{model_name}.py'
+            init_path = self.work_path /'schemas' / '__init__.py'
             file_path = self.work_path /'schemas' / file_name
             fields_map = self.get_fields_map(model_name)
             base_fields = '\n    '.join(f'{k}: {v}' for k, v in fields_map.items() if k != self.pk_name)
 
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(SCHEMA_TEMPLATE.format(
-                    model_name=model_name,
-                    title_model_name=model_name.title(),
-                    base_fields=base_fields,
-                    pk_name=self.pk_name,
-                    pk_type=fields_map.get(self.pk_name, 'int'),
-                ))
+            try:
+                with open(file_path, 'w', encoding=self.encoding) as f:
+                    f.write(SCHEMA_TEMPLATE.format(
+                        model_name=model_name,
+                        title_model_name=model_name.title(),
+                        base_fields=base_fields,
+                        pk_name=self.pk_name,
+                        pk_type=fields_map.get(self.pk_name, 'int'),
+                    ))
+                with open(init_path, 'a', encoding=self.encoding) as f:
+                    f.write(f'from .{model_name} import *\n')
+            except Exception as e:
+                print(f"生成 {file_name} 错误: {e}")
 
     def generate_routers(self):
         """生成 router 代码"""
+        append_routes: list[str] = []
+
         for model_name in self.models:
-            file_name = f"{model_name}_router.py"
+            file_name = f'{model_name}_router.py'
+            init_path = self.work_path / 'routers' / '__init__.py'
             file_path = self.work_path / 'routers' / file_name
 
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(ROUTER_TEMPLATE.format(model_name=model_name, title_model_name=model_name.title()))
+            try:
+                with open(file_path, 'w', encoding=self.encoding) as f:
+                    f.write(ROUTER_TEMPLATE.format(model_name=model_name, title_model_name=model_name.title()))
+                with open(init_path, 'a', encoding=self.encoding) as f:
+                    f.write(f'from .{model_name}_router import {model_name}_router as {model_name}_router\n')
+                append_routes.append(model_name)
+            except Exception as e:
+                print(f"生成 {file_name} 错误: {e}")
+
+        try:
+            main_init_path = self.work_path / '__init__.py'
+
+            with open(main_init_path, 'a', encoding=self.encoding) as f:
+                for model_name in append_routes:
+                    f.write(f'from app.routers import {model_name}_router as {model_name}_router\n')
+
+                f.write('\n')
+                for model_name in append_routes:
+                    f.write(f"app.include_router({model_name}_router, prefix='/{model_name}', tags=['{model_name.title()}'])\n")
+        except Exception as e:
+            print(f"追加路由到 {main_init_path} 错误: {e}")
 
     def generate_services(self):
         """生成 service 代码"""
         for model_name in self.models:
-            file_name = f"{model_name}_service.py"
+            file_name = f'{model_name}_service.py'
+            init_path = self.work_path /'services' / '__init__.py'
             file_path = self.work_path /'services' / file_name
 
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(SERVICE_TEMPLATE.format(model_name=model_name, title_model_name=model_name.title()))
+            try:
+                with open(file_path, 'w', encoding=self.encoding) as f:
+                    f.write(SERVICE_TEMPLATE.format(model_name=model_name, title_model_name=model_name.title()))
+                with open(init_path, 'a', encoding=self.encoding) as f:
+                    f.write(f'from . import {model_name}_service as {model_name}_service\n')
+            except Exception as e:
+                print(f"生成 {file_name} 错误: {e}")
 
     def build(self):
         """构建项目"""
@@ -74,6 +113,8 @@ class Generator:
 
 SCHEMA_TEMPLATE = """#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
