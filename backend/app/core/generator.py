@@ -210,7 +210,7 @@ async def get(id: int):
 
 async def add({model_name}: schemas.{title_model_name}Create):
     db_{model_name} = models.{title_model_name}(
-        **{model_name}.model_dump(),
+        **{model_name}.model_dump(exclude_unset=True),
     )
     await db_{model_name}.save()
 

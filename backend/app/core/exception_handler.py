@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from fastapi import Request
 from starlette.exceptions import HTTPException
 from fastapi.exceptions import RequestValidationError
-from fastapi import Request
-from pydantic import ValidationError
+from pydantic import ValidationError as PydanticValidationError
 from jwt.exceptions import (
     ExpiredSignatureError,
     InvalidSignatureError,
     DecodeError,
     InvalidTokenError,
     PyJWTError,
+)
+from tortoise.exceptions import (
+    ValidationError as TortoiseValidationError,
+    BaseORMException,
 )
 
 from .exceptions import (
@@ -21,6 +25,7 @@ from .exceptions import (
 )
 from app.core import JSONResponseResult, logger
 from app import app
+
 
 ################## 服务器异常 ##################
 
@@ -58,8 +63,8 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
     return JSONResponseResult.failure('请求参数有误')
 
 
-@app.exception_handler(ValidationError)
-async def validation_exception_handler(request: Request, exc: ValidationError):
+@app.exception_handler(PydanticValidationError)
+async def validation_exception_handler(request: Request, exc: PydanticValidationError):
     method = request.scope["method"]
     path = request.scope["path"]
     logger.warning(msg=f"'{method} {path}' 请求参数有误 {exc.errors()}")
@@ -93,6 +98,20 @@ async def jwt_exception_handler_4(request: Request, exc: InvalidTokenError):
 async def jwt_exception_handler_5(request: Request, exc: PyJWTError):
     logger.error(msg=f"未知令牌错误", exc_info=exc)
     return JSONResponseResult.unauthorized('未知令牌错误')
+
+
+################## Tortoise ORM 异常 ##################
+
+
+@app.exception_handler(TortoiseValidationError)
+async def tortoise_validation_exception_handler(request: Request, exc: TortoiseValidationError):
+    return JSONResponseResult.failure(f'Tortoise ORM 验证错误: "{exc}"')
+
+
+@app.exception_handler(BaseORMException)
+async def tortoise_orm_exception_handler(request: Request, exc: BaseORMException):
+    logger.error(msg=f"未知 Tortoise ORM 错误", exc_info=exc)
+    return JSONResponseResult.failure('未知 Tortoise ORM 错误')
 
 
 ################## 自定义异常 ##################

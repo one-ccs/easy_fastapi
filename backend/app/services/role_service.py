@@ -20,7 +20,7 @@ async def get(id: int):
 
 async def add(role: schemas.RoleCreate):
     db_role = models.Role(
-        **role.model_dump(),
+        **role.model_dump(exclude_unset=True),
     )
     await db_role.save()
 

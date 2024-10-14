@@ -33,7 +33,7 @@ async def add(user: schemas.UserCreate):
         raise FailureException('邮箱已存在')
 
     db_user = models.User(
-        **user.model_dump(exclude={'password'}),
+        **user.model_dump(exclude={'password'}, exclude_unset=True),
         hashed_password=encrypt_password(user.password),
     )
     await db_user.save()

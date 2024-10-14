@@ -12,15 +12,15 @@ class UserBase(BaseModel):
     email: EmailStr | None = None
     username: str | None = None
 
+    @field_serializer('created_at', check_fields=False)
+    def serialize_created_at(self, value: datetime) -> str:
+        return DateTimeUtil.strftime(value)
+
 
 class User(UserBase):
     avatar_url: str | None = None
     created_at: datetime
     roles: list[Role] = []
-
-    @field_serializer('created_at')
-    def serialize_created_at(self, value: datetime) -> str:
-        return DateTimeUtil.strftime(value)
 
 
 class UserCreate(UserBase):
