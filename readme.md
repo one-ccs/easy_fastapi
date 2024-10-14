@@ -23,7 +23,7 @@ project-root/
 │   │   │   ├─ exceptions/   # 异常类目录
 │   │   │   │   └─ *_exception.py        # 自定义异常类
 │   │   │   │
-│   │   │   ├─ authorization.py     # 认证授权相关配置
+│   │   │   ├─ authorize.py         # 认证授权相关配置
 │   │   │   ├─ config.py            # 项目配置
 │   │   │   ├─ db.py                # 数据库配置
 │   │   │   ├─ exception_handler.py # 异常处理配置

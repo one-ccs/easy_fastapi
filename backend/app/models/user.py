@@ -22,7 +22,7 @@ class User(ObjectUtil.MagicClass, ExtendedCRUD, Model):
     created_at      = fields.DatetimeField(auto_now_add=True, description='创建时间')
 
     roles: fields.ManyToManyRelation[Role] = fields.ManyToManyField(
-        'models.Role', related_name='users', through='user_role',
+        'models.Role', related_name='users', through='user_role', description='用户角色',
     )
 
     @staticmethod

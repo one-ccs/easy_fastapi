@@ -15,10 +15,10 @@ from app.services import authorize_service
 from app import schemas
 
 
-authorization_router = APIRouter()
+authorize_router = APIRouter()
 
 
-@authorization_router.post(
+@authorize_router.post(
     '/token',
     summary='获取令牌',
     description='获取令牌接口',
@@ -29,7 +29,7 @@ async def token(
     return await authorize_service.token(form_data)
 
 
-@authorization_router.post(
+@authorize_router.post(
     '/login',
     summary='登录',
     description='用户登录接口',
@@ -40,7 +40,7 @@ async def login(
     return await authorize_service.login(form_data)
 
 
-@authorization_router.post(
+@authorize_router.post(
     '/register',
     summary='注册',
     description='用户注册接口',
@@ -51,7 +51,7 @@ async def register(
     return await authorize_service.register(form_data)
 
 
-@authorization_router.post(
+@authorize_router.post(
     '/logout',
     summary='登出',
     description='用户登出接口',
@@ -63,7 +63,7 @@ async def logout(
     return await authorize_service.logout(x_token, access_token)
 
 
-@authorization_router.post(
+@authorize_router.post(
     '/refresh',
     summary='刷新令牌',
     description='刷新令牌接口',
