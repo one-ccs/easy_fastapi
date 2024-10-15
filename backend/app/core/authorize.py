@@ -19,9 +19,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=config.SWAGGER_TOKEN_URL)
 
 class TokenData(BaseModel):
     # 是否是刷新令牌
-    isr: bool
-    # 权限集合
-    sco: set[str] | None = None
+    isr: bool = False
+    # 权限列表
+    sco: list[str] | None = None
     # 用户名
     sub: str
     # 过期时间
@@ -48,18 +48,18 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
 
 
-def create_access_token(*, sub: str) -> str:
+def create_access_token(*, sub: str, sco: list[str] | None = None) -> str:
     """创建访问令牌"""
     expire = DateTimeUtil.now() + config.ACCESS_TOKEN_EXPIRE_MINUTES
-    to_encode = {'sub': sub, 'exp': expire, 'isr': False}
+    to_encode = {'sub': sub, 'sco': sco, 'exp': expire, 'isr': False}
     encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
 
 
-def create_refresh_token(*, sub: str) -> str:
+def create_refresh_token(*, sub: str, sco: list[str] | None = None) -> str:
     """创建刷新令牌"""
     expire = DateTimeUtil.now() + config.REFRESH_TOKEN_EXPIRE_MINUTES
-    to_encode = {'sub': sub, 'exp': expire, 'isr': True}
+    to_encode = {'sub': sub, 'sco': sco, 'exp': expire, 'isr': True}
     encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
 
@@ -98,7 +98,7 @@ async def require_permission(permissions: set[str], token: str = Depends(require
     """检查用户是否具有指定的所有权限"""
     payload = decode_token(token)
 
-    if not payload.sco or not payload.sco.issuperset(permissions):
+    if not payload.sco or not set(payload.sco).issuperset(permissions):
         raise ForbiddenException('无权访问')
     return payload
 

@@ -10,7 +10,8 @@ from .role import Role
 
 class User(ObjectUtil.MagicClass, ExtendedCRUD, Model):
     """用户表"""
-    _str_ignore = {'hashed_password'}
+    _str_exclude = {'hashed_password'}
+    _str_include = {'_roles'}
 
     id              = fields.IntField(primary_key=True, description='用户 id')
     email           = fields.CharField(max_length=64, null=True, unique=True, db_index=True, description='邮箱')
@@ -27,17 +28,22 @@ class User(ObjectUtil.MagicClass, ExtendedCRUD, Model):
 
     @staticmethod
     async def by_username(username: str):
-        return await User.filter(username=username).first()
+        return await User.filter(username=username).prefetch_related('roles').first()
 
     @staticmethod
     async def by_email(email: str):
-        return await User.filter(email=email).first()
+        return await User.filter(email=email).prefetch_related('roles').first()
 
     @staticmethod
     async def by_username_or_email(username_or_email: str):
         return await User.filter(
             Q(username=username_or_email) | Q(email=username_or_email),
-        ).first()
+        ).prefetch_related('roles').first()
 
-    async def get_roles(self):
-        return await self.roles.all()
+    def get_permissions(self) -> list[str]:
+        """获取用户权限"""
+        return [role.role for role in self.roles]
+
+    def has_permission(self, permission: str) -> bool:
+        """判断用户是否有指定权限"""
+        return permission in self.get_permissions()

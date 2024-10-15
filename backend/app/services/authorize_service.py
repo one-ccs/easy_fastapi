@@ -25,8 +25,9 @@ async def token(form_data: OAuth2PasswordRequestForm):
     if not verify_password(form_data.password, db_user.hashed_password):
         raise FailureException('密码错误')
 
-    access_token = create_access_token(sub=form_data.username)
-    refresh_token = create_refresh_token(sub=form_data.username)
+    permissions = db_user.get_permissions()
+    access_token = create_access_token(sub=form_data.username, sco=permissions)
+    refresh_token = create_refresh_token(sub=form_data.username, sco=permissions)
 
     return {
         'token_type': 'bearer',
@@ -44,14 +45,12 @@ async def login(form_data: OAuth2PasswordRequestForm):
     if not verify_password(form_data.password, db_user.hashed_password):
         raise FailureException('密码错误')
 
-    access_token = create_access_token(sub=form_data.username)
-    refresh_token = create_refresh_token(sub=form_data.username)
+    permissions = db_user.get_permissions()
+    access_token = create_access_token(sub=form_data.username, sco=permissions)
+    refresh_token = create_refresh_token(sub=form_data.username, sco=permissions)
 
     return Result('登录成功', data={
-        'user': {
-            **db_user(),
-            'roles': await db_user.get_roles(),
-        },
+        'user': db_user,
         'token_type': 'bearer',
         'access_token': access_token,
         'refresh_token': refresh_token,

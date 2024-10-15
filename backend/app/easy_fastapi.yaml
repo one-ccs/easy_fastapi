@@ -78,6 +78,8 @@ database:
     username: root
     # *
     password: 123456
+    # 是否打印日志，默认 False
+    echo: False
 
 
 # redis 配置

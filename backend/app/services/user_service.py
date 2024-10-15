@@ -11,15 +11,12 @@ from app import schemas, models
 
 
 async def get(id: int):
-    db_user = await models.User.by_id(id)
+    db_user = await models.User.by_id(id, ('roles', ))
 
     if not db_user:
         raise FailureException('用户不存在')
 
-    return Result(data={
-        **db_user(),
-        'roles': await db_user.get_roles(),
-    })
+    return Result(data=db_user)
 
 
 async def add(user: schemas.UserCreate):
@@ -39,14 +36,11 @@ async def add(user: schemas.UserCreate):
     await db_user.save()
     await db_user.roles.add(await models.Role.get(role='user'))
 
-    return Result(data={
-        **db_user(),
-        'roles': await db_user.get_roles(),
-    })
+    return Result(data=db_user)
 
 
 async def modify(user: schemas.UserModify):
-    db_user = await models.User.by_id(user.id)
+    db_user = await models.User.by_id(user.id, ('roles', ))
 
     if not db_user:
         raise FailureException('用户不存在')
@@ -59,10 +53,7 @@ async def modify(user: schemas.UserModify):
     )
     await db_user.save()
 
-    return Result(data={
-        **db_user(),
-        'roles': await db_user.get_roles(),
-    })
+    return Result(data=db_user)
 
 
 async def delete(ids: list[int]):
@@ -75,25 +66,16 @@ async def page(page_query: schemas.PageQuery):
     pagination = await models.User.paginate(
         page_query.page,
         page_query.size,
+        ('roles', ),
         Q(username__icontains=page_query.query) | Q(email__icontains=page_query.query),
     )
-
-    return Result(data={
-        'total': pagination.total,
-        'items': [{
-            **item(),
-            'roles': await item.get_roles(),
-        } for item in pagination.items],
-        'finished': pagination.finished,
-    })
+    return Result(data=pagination)
 
 
 async def get_user_roles(id: int):
-    db_user = await models.User.by_id(id)
+    db_user = await models.User.by_id(id, ('roles', ))
 
     if not db_user:
         raise FailureException('用户不存在')
 
-    db_roles = await db_user.get_roles()
-
-    return Result(data=db_roles)
+    return Result(data=db_user.roles)

@@ -67,6 +67,7 @@ GZIP_COMPRESS_LEVEL: int        = get_config('fastapi.middleware.gzip.compressle
 DATABASE_URL: str | None        = get_config('database.url', None)
 DATABASE_USER: str | None       = get_config('database.username', None)
 DATABASE_PASSWORD: str | None   = get_config('database.password', None)
+DATABASE_ECHO: bool             = get_config('database.echo', False)
 
 # redis
 REDIS_HOST: str | None          = get_config('redis.host', None)
