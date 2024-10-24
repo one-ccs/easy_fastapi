@@ -80,6 +80,8 @@ database:
     password: 123456
     # 是否打印日志，默认 False
     echo: False
+    # 时区，默认 Asia/Chongqing
+    timezone: Asia/Chongqing
 
 
 # redis 配置

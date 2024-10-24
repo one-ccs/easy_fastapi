@@ -81,8 +81,9 @@ async def register(form_data: schemas.Register):
         hashed_password=encrypt_password(form_data.password),
     )
     await db_user.save()
-    # TODO 没有角色时，创建默认角色
-    await db_user.roles.add(await models.Role.get_or_create(role='user'))
+
+    default_role, _ = await models.Role.get_or_create(role='user', role_desc='用户')
+    await db_user.roles.add(default_role)
 
     return Result('注册成功', data={
         'username': db_user.username or db_user.email,

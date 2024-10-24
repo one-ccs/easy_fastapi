@@ -68,6 +68,7 @@ DATABASE_URL: str | None        = get_config('database.url', None)
 DATABASE_USER: str | None       = get_config('database.username', None)
 DATABASE_PASSWORD: str | None   = get_config('database.password', None)
 DATABASE_ECHO: bool             = get_config('database.echo', False)
+DATABASE_TIMEZONE: str          = get_config('database.timezone', 'Asia/Chongqing')
 
 # redis
 REDIS_HOST: str | None          = get_config('redis.host', None)

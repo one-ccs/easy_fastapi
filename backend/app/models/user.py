@@ -17,8 +17,8 @@ class User(ObjectUtil.MagicClass, ExtendedCRUD, Model):
     email           = fields.CharField(max_length=64, null=True, unique=True, db_index=True, description='邮箱')
     username        = fields.CharField(max_length=32, null=True, unique=True, db_index=True, description='用户名')
     hashed_password = fields.CharField(max_length=64, description='密码')
-    token           = fields.CharField(max_length=256, null=True, description='访问令牌')
-    avatar_url      = fields.CharField(max_length=256, null=True, description='头像地址')
+    token           = fields.CharField(max_length=255, null=True, description='访问令牌')
+    avatar_url      = fields.CharField(max_length=255, null=True, description='头像地址')
     is_active       = fields.BooleanField(default=True, description='是否激活')
     created_at      = fields.DatetimeField(auto_now_add=True, description='创建时间')
 

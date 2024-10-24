@@ -34,7 +34,9 @@ async def add(user: schemas.UserCreate):
         hashed_password=encrypt_password(user.password),
     )
     await db_user.save()
-    await db_user.roles.add(await models.Role.get(role='user'))
+
+    default_role, _ = await models.Role.get_or_create(role='user', role_desc='用户')
+    await db_user.roles.add(default_role)
 
     return Result(data=db_user)
 
