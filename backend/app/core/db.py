@@ -57,6 +57,9 @@ class ExtendedCRUD():
 
     @classmethod
     async def by_id(cls: Type[_TModel], id: int, prefetch: tuple[str | Prefetch] | None = None) -> _TModel | None:
+        if prefetch and not isinstance(prefetch, tuple):
+            raise TypeError('prefetch 参数应该是 tuple[str | Prefetch] 类型')
+
         return await cls.get_or_none(id=id).prefetch_related(*prefetch) if prefetch else await cls.get_or_none(id=id)
 
     @classmethod
