@@ -3,7 +3,7 @@
 
 
 def execute_from_command_line():
-    import os, argparse, uvicorn
+    import sys, os, argparse, uvicorn
 
     from easy_fastapi import __version__
     from easy_fastapi import logger
@@ -47,11 +47,14 @@ def execute_from_command_line():
     gen_parser.add_argument('-im', dest='_im', nargs='?', default='user,role', help='要忽略的模型列表, 用逗号分隔, 默认为 "user,role"')
 
     args = parser.parse_args()
+    work_path = os.path.abspath(args.path)
 
     logger.setLevel(args.lv)
-    logger.debug(f'工作路径: {os.path.abspath(args.path)}')
+    logger.debug(f'工作路径: {work_path}')
 
-    os.chdir(args.path)
+    # 添加包导入路径并设置工作路径
+    sys.path.insert(0, work_path)
+    os.chdir(work_path)
 
     match args.cmd:
         case 'run':
@@ -77,12 +80,12 @@ def execute_from_command_line():
                     print(f.read())
             elif args.db_cmd == 'init-table':
                 from tortoise import run_async
-                from app.core import generate_schemas
+                from app.core import generate_schemas # type: ignore
 
                 run_async(generate_schemas())
         case 'gen':
-            from app import models
-            from app.core import Generator
+            from app import models # type: ignore
+            from app.core import Generator # type: ignore
 
             Generator(
                 models_path=models.__path__,
