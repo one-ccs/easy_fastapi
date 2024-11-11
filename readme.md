@@ -2,7 +2,7 @@
 
 基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，并且可以在编写好 `models` 文件后执行 `manager.py gen` 命令，批量生成 `schemas`、`routers`、`services` 代码，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，大大减少了项目的前期开发工作，帮助开发者快速构建和部署后端服务。
 
-![alt text](backend/preview/preview_1.jpeg)
+![alt text](frontend/assets/image/preview_1.jpeg)
 
 ## 一、主要特点
 
@@ -131,12 +131,12 @@ if not verify_password(form_data.password, user.hashed_password):
 
 项目管理文件 `manager.py` 包含了项目的管理命令，包括但不限于：
 
-- `manager.py run` 启动项目生成环境
-- `manager.py run --reload` 启动项目开发环境
-- `manager.py db init` 初始化 Aerich 配置
-- `manager.py db init-db` 初始化数据库
-- `manager.py db init-table` 初始化表
-- `manager.py db migrate` 数据库迁移
-- `manager.py db upgrade` 数据库升级
-- `manager.py db downgrade` 数据库降级
-- `manager.py gen` 生成代码
+- `easy_fastapi run` 启动项目生成环境
+- `easy_fastapi run --reload` 启动项目开发环境
+- `easy_fastapi db init` 初始化 Aerich 配置
+- `easy_fastapi db init-db` 初始化数据库
+- `easy_fastapi db init-table` 初始化表
+- `easy_fastapi db migrate` 数据库迁移
+- `easy_fastapi db upgrade` 数据库升级
+- `easy_fastapi db downgrade` 数据库降级
+- `easy_fastapi gen` 生成代码

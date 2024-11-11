@@ -12,7 +12,7 @@ def execute_from_command_line():
 
     parser.add_argument('-h', '--help', action='help', help='显示帮助信息并退出')
     parser.add_argument('-v', '--version', help='显示版本信息并退出', action='version', version=f'%(prog)s {__version__}')
-    parser.add_argument('--path', help='工作路径', default='.')
+    parser.add_argument('--path', help='工作目录, 默认 "backend"', default='backend')
     parser.add_argument('--lv', help='日志级别', default='INFO', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'])
 
     subparsers = parser.add_subparsers(
@@ -50,7 +50,7 @@ def execute_from_command_line():
     work_path = os.path.abspath(args.path)
 
     logger.setLevel(args.lv)
-    logger.debug(f'工作路径: {work_path}')
+    logger.debug(f'工作目录: {work_path}')
 
     # 添加包导入路径并设置工作路径
     sys.path.insert(0, work_path)

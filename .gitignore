@@ -4,6 +4,7 @@
 .history
 __pycache__
 node_modules
+release
 dist
 logs
 **/alembic/versions/

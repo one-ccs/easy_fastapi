@@ -38,9 +38,11 @@ ALGORITHM: str                  = get_config('easy_fastapi.authorization.algorit
 ACCESS_TOKEN_EXPIRE_MINUTES     = get_config('easy_fastapi.authorization.access_token_expire_minutes', 15)
 REFRESH_TOKEN_EXPIRE_MINUTES    = get_config('easy_fastapi.authorization.refresh_token_expire_minutes', 60 * 24 * 7)
 
-UPLOAD_FOLDER                   = get_config('easy_fastapi.resources.upload_folder', None)
-TEMPLATES_FOLDER                = get_config('easy_fastapi.resources.templates_folder', None)
-STATIC_FOLDER                   = get_config('easy_fastapi.resources.static_folder', None)
+UPLOAD_FOLDER: str | None       = get_config('easy_fastapi.resources.upload_folder', None)
+TEMPLATES_FOLDER: str | None    = get_config('easy_fastapi.resources.templates_folder', None)
+STATIC_NAME: str | None         = get_config('easy_fastapi.resources.static.name', None)
+STATIC_URL: str | None          = get_config('easy_fastapi.resources.static.url', None)
+STATIC_FOLDER: str | None       = get_config('easy_fastapi.resources.static.folder', None)
 
 # fastapi
 ROOT_PATH: str                  = get_config('fastapi.root_path', '/api')
@@ -102,6 +104,12 @@ DATABASE_URI: str = DATABASE_URL.replace('://', f'://{DATABASE_USER}:{DATABASE_P
 ACCESS_TOKEN_EXPIRE_MINUTES : timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 REFRESH_TOKEN_EXPIRE_MINUTES: timedelta = timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
 
-UPLOAD_FOLDER: str    = PathUtil.abspath(UPLOAD_FOLDER)
-TEMPLATES_FOLDER: str = PathUtil.abspath(TEMPLATES_FOLDER)
-STATIC_FOLDER: str    = PathUtil.abspath(STATIC_FOLDER)
+
+if UPLOAD_FOLDER:
+    UPLOAD_FOLDER = PathUtil.abspath(UPLOAD_FOLDER)
+
+if TEMPLATES_FOLDER:
+    TEMPLATES_FOLDER = PathUtil.abspath(TEMPLATES_FOLDER)
+
+if STATIC_FOLDER:
+    STATIC_FOLDER = PathUtil.abspath(STATIC_FOLDER)

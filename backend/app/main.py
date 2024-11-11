@@ -4,12 +4,14 @@ from typing import Callable
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from app.core import config, init_tortoise
+from app.core import logger, config, init_tortoise
 
 
 @asynccontextmanager
@@ -66,6 +68,19 @@ if config.GZIP_ENABLED:
         minimum_size=config.GZIP_MINIMUM_SIZE,
         compresslevel=config.GZIP_COMPRESS_LEVEL
     )
+
+if config.TEMPLATES_FOLDER:
+    logger.debug(f'静态文件配置: {config.TEMPLATES_FOLDER}')
+    with open(config.TEMPLATES_FOLDER + '/index.html', 'r', encoding='utf-8') as f:
+        index_html = f.read()
+
+    @app.get('/', response_class=HTMLResponse)
+    async def root():
+        return index_html
+
+if config.STATIC_NAME and config.STATIC_URL and config.STATIC_FOLDER:
+    logger.debug(f'静态资源配置: {config.STATIC_NAME} -> {config.STATIC_URL} -> {config.STATIC_FOLDER}')
+    app.mount(config.STATIC_URL, StaticFiles(directory=config.STATIC_FOLDER), name=config.STATIC_NAME)
 
 
 @app.middleware('http')
