@@ -11,12 +11,6 @@ from .exceptions import (
     UnauthorizedException,
     NotFoundException,
 )
-from .yaml import (
-    load_yaml,
-    dump_yaml,
-    read_yaml,
-    write_yaml,
-)
 from . import config
 from .generator import Generator
 from .authorize import (
@@ -45,11 +39,6 @@ __all__ = [
     'FailureException',
     'UnauthorizedException',
     'NotFoundException',
-
-    'load_yaml',
-    'dump_yaml',
-    'read_yaml',
-    'write_yaml',
 
     'config',
 

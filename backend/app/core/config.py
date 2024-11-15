@@ -3,30 +3,18 @@
 from typing import Any
 from pathlib import Path
 from datetime import timedelta
-from easy_pyoc import ObjectUtil, PathUtil
+from easy_pyoc import ObjectUtil, PathUtil, YAMLUtil
 
 from .logger import logger
-from .yaml import read_yaml
 
 
 CONFIG_PATH = Path(__file__).parent.parent.joinpath('easy_fastapi.yaml')
 
-if not PathUtil.is_exists_file(CONFIG_PATH):
-    raise FileNotFoundError(f'配置文件 {CONFIG_PATH} 不存在')
 
-yaml_config = read_yaml(CONFIG_PATH) or {}
+yaml_config = YAMLUtil.load(CONFIG_PATH) or {}
 
 
 def get_config(path: str, default: Any = None) -> Any:
-    """获取配置内容
-
-    Args:
-        path (str): 配置路径，以点号分隔，如 "easy_fastapi.app.force_200_code"
-        default (Any, optional): 默认值. Defaults to None.
-
-    Returns:
-        Any: 配置内容
-    """
     return ObjectUtil.get_value_from_dict(yaml_config, path, default)
 
 

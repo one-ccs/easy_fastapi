@@ -29,6 +29,7 @@ setup(
     package_data={},
     exclude_package_data={},
     install_requires=[
+        'easy_pyoc',
         'fastapi',
         'tortoise-orm',
         'pydantic',

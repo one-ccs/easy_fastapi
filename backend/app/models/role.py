@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from tortoise import Model, fields
-from easy_pyoc import ObjectUtil
+from easy_pyoc import Magic
 
 from app.core import ExtendedCRUD
 
 
-class Role(ObjectUtil.MagicClass, ExtendedCRUD, Model):
+class Role(Magic, ExtendedCRUD, Model):
     """角色表"""
 
     id        = fields.IntField(primary_key=True, description='角色 id')

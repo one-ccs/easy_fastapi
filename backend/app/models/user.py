@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 from tortoise import Model, fields
 from tortoise.expressions import Q
-from easy_pyoc import ObjectUtil
+from easy_pyoc import Magic
 
 from app.core import ExtendedCRUD
 from .role import Role
 
 
-class User(ObjectUtil.MagicClass, ExtendedCRUD, Model):
+class User(Magic, ExtendedCRUD, Model):
     """用户表"""
     _str_exclude = {'hashed_password'}
     _str_include = {'_roles'}
