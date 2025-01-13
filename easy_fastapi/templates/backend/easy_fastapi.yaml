@@ -1,0 +1,128 @@
+# 项目配置文件
+# 请在此文件中配置项目相关信息，如数据库连接信息、安全认证配置、日志配置等
+# 带 * 号表示必选项
+
+easy_fastapi:
+    # 是否强制所有除 500 外的状态码都返回 200 状态码，默认 False
+    force_200_code: False
+    # 安全认证配置
+    authorization:
+        # * 密钥，默认 None
+        secret_key: easy_fastapi
+        # 算法，默认 HS256
+        algorithm: HS256
+        # 访问令牌过期时间，默认 15 分钟
+        access_token_expire_minutes: 30
+        # 刷新令牌过期时间，默认 10080 分钟，即 7 天
+        refresh_token_expire_days: 10080
+    # 路径相关配置
+    resources:
+        # 上传文件保存目录
+        upload_folder: ./upload
+        # 模板文件目录
+        templates_folder: ../frontend/
+        # 静态资源目录所在目录
+        static_folder: ../frontend/
+        # 静态资源目录名
+        static_name: assets
+        # 静态资源 URL
+        static_url: /assets
+
+
+fastapi:
+    # root_path，默认 /
+    root_path: /api
+    # 文档配置
+    swagger:
+        # 文档标题
+        title: Easy FastAPI
+        # 文档描述
+        description: 基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。
+        # 文档版本
+        version: 0.12.0
+        # 联系信息
+        contact:
+            # 联系人
+            name: one-ccs
+            # 联系人 URL
+            url: ~
+            # 联系人邮箱
+            email: one-ccs@foxmail.com
+        # 许可证信息
+        license:
+            # 许可证名称
+            name: 开源协议：MIT
+            # 许可证 URL
+            url: https://github.com/one-ccs/easy_fastapi?tab=MIT-1-ov-file#readme
+        # 用于获取访问令牌的 URL，默认 /token
+        token_url: /token
+        # 默认 /docs
+        docs_url: /api-docs
+        # 默认 /redoc
+        redoc_url: /api-redoc
+        # 默认 /openapi.json
+        openapi_url: /api-json
+    # 中间件配置
+    middleware:
+        # 跨域配置
+        cors:
+            # 是否启用跨域，默认 False
+            enabled: False
+            # 允许的域列表，默认 ['*']
+            allow_origins:
+                - '*'
+            # 是否允许请求携带 cookie，默认 True
+            allow_credentials: True
+            # 允许的请求方法，默认 ['*']
+            allow_methods:
+                - '*'
+            # 允许的请求头，默认 ['*']
+            allow_headers:
+                - '*'
+        # 强制所有传入请求必须是 https 或 wss
+        https_redirect:
+            enabled: False
+        # 强制所有传入请求都必须正确设置 Host 请求头，以防 HTTP 主机头攻击
+        trusted_host:
+            enabled: False
+            allowed_hosts:
+                - '*'
+        # gzip 压缩配置
+        gzip:
+            enabled: False
+            minimum_size: 1000
+            compresslevel: 5
+
+
+# 数据库配置
+database:
+    # * 数据库用户名
+    username: root
+    # * 数据库密码
+    password: '123456'
+    # * 数据库名称
+    database: easy_fastapi
+    # 数据库主机名，默认 127.0.0.1
+    host: 127.0.0.1
+    # 数据库端口号，默认 3306
+    port: 3306
+    # 是否打印日志，默认 False
+    echo: False
+    # 时区，默认 Asia/Chongqing
+    timezone: Asia/Chongqing
+
+
+# redis 配置
+redis:
+    # 是否启用，默认 False
+    enabled: False
+    # * 主机名，默认 None
+    host: 127.0.0.1
+    # 密码，默认 None
+    password: ~
+    # 端口号，默认 6379
+    port: 6379
+    # 数据库号，默认 0
+    db: 0
+    # 是否解码响应，默认 True
+    decode_responses: True

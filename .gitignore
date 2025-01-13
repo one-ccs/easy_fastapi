@@ -1,15 +1,11 @@
-.vscode
-.idea
-.vscodecounter
-.history
-__pycache__
-node_modules
-release
-dist
-logs
-**/alembic/versions/
+.vscode/
+.vscodecounter/
+__pycache__/
+build/
+dist/
+release/
+*.egg-info/
 migrations/
-stress_testing/
 
 *.log*
 *.local

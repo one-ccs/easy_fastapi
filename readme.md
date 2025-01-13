@@ -2,7 +2,7 @@
 
 基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，并且可以在编写好 `models` 文件后执行 `manager.py gen` 命令，批量生成 `schemas`、`routers`、`services` 代码，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，大大减少了项目的前期开发工作，帮助开发者快速构建和部署后端服务。
 
-![alt text](frontend/assets/image/preview_1.jpeg)
+![alt text](easy_fastapi/templates/frontend/assets/image/preview_1.jpeg)
 
 ## 一、主要特点
 
@@ -103,40 +103,27 @@ if not verify_password(form_data.password, user.hashed_password):
 
 ## 四、部署
 
-1. 安装依赖 `cd backend && pip install -r requirements.txt`
-2. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
-3. （可选）添加或修改 `backend.app.models` 中的模型
-   1. 执行代码生成器 `manager.py gen` 生成基本业务代码
-   2. 根据实际清空添加或修改业务代码
-4. 创建数据库
-5. 初始化数据库
-   1. 初始化 Aerich 配置 `manager.py db init`
-   2. 初始化数据库 `manager.py db init-db`
-   3. 初始化表 `manager.py db init-table`
-6. 创建 `backend/logs` 目录
-7. 启动项目
-   - 调试
-     - `uvicorn app:app --reload`
-     - `manager.py run --reload`
-   - 生产
-     - `uvicorn app:app --log-config uvicorn_log_config.json --log-level warning`
-     - `manager.py run`
+1. 安装依赖 `pip install easy_fastapi`
+2. 初始化项目 `easy_fastapi init`
+3. 启动项目
+   1. 切换工作目录 `cd <项目名称>/backend`
+   2. 启动项目
+      - 开发环境: `easy_fastapi run --reload` 等价于 `uvicorn app:app --reload`
+      - 生产环境: `easy_fastapi run` 等价于 `uvicorn app:app --log-config uvicorn_log_config.json --log-level warning`
 
-## 五、测试
+## 五、开发
+
+1. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
+2. 添加或修改 `backend.app.models` 中的模型
+   1. 执行代码生成器 `easy_fastapi gen` 生成基本业务代码
+   2. 根据实际清空添加或修改业务代码
+3. 创建数据库
+4. 初始化数据库
+   1. 初始化 Aerich 配置 `easy_fastapi db init`
+   2. 初始化数据库 `easy_fastapi db init-db`
+   3. 初始化表 `easy_fastapi db init-table`
+
+## 六、测试
 
 1. 在 `backend/test` 目录中添加测试文件
-2. 运行 `cd backend/test && pytest` 查看测试结果
-
-## 六、manager.py
-
-项目管理文件 `manager.py` 包含了项目的管理命令，包括但不限于：
-
-- `easy_fastapi run` 启动项目生成环境
-- `easy_fastapi run --reload` 启动项目开发环境
-- `easy_fastapi db init` 初始化 Aerich 配置
-- `easy_fastapi db init-db` 初始化数据库
-- `easy_fastapi db init-table` 初始化表
-- `easy_fastapi db migrate` 数据库迁移
-- `easy_fastapi db upgrade` 数据库升级
-- `easy_fastapi db downgrade` 数据库降级
-- `easy_fastapi gen` 生成代码
+2. 运行 `pytest backend/test` 查看测试结果
