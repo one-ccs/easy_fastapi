@@ -30,7 +30,7 @@ async def token(form_data: OAuth2PasswordRequestForm):
     refresh_token = create_refresh_token(sub=form_data.username, sco=permissions)
 
     return {
-        'token_type': 'bearer',
+        'token_type': 'Bearer',
         'access_token': access_token,
         'refresh_token': refresh_token,
     }
@@ -51,7 +51,7 @@ async def login(form_data: OAuth2PasswordRequestForm):
 
     return Result('登录成功', data={
         'user': db_user,
-        'token_type': 'bearer',
+        'token_type': 'Bearer',
         'access_token': access_token,
         'refresh_token': refresh_token,
     })
@@ -61,7 +61,7 @@ async def refresh(current_user: TokenData):
     access_token = create_access_token(sub=current_user.sub)
 
     return Result('刷新令牌成功', data={
-        'token_type': 'bearer',
+        'token_type': 'Bearer',
         'access_token': access_token,
     })
 

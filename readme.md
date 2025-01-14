@@ -126,4 +126,4 @@ if not verify_password(form_data.password, user.hashed_password):
 ## 六、测试
 
 1. 在 `backend/test` 目录中添加测试文件
-2. 运行 `pytest backend/test` 查看测试结果
+2. 运行 `cd backend && pytest test` 查看测试结果

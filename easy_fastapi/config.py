@@ -182,13 +182,10 @@ class Database(BaseModel):
     @property
     def uri(self) -> str:
         """生成数据库连接 URI"""
-        # 创建数据库连接字符串
-        if self.username and self.password:
-            return f"mysql://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}"
-        elif self.username:
-            return f"mysql://{self.username}@{self.host}:{self.port}/{self.database}"
-        else:
-            return f"mysql://{self.host}:{self.port}/{self.database}"
+        if not self.username or not self.password or not self.database:
+            uvicorn_logger.error('数据库用户名、密码、数据库名称不能为空')
+
+        return f"mysql://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}"
 
     @field_validator('username')
     @classmethod
@@ -243,7 +240,7 @@ try:
     config = Config(**(YAMLUtil.load(CONFIG_PATH) or {}))
 except FileNotFoundError:
     config = Config()
-    uvicorn_logger.warning(f'配置文件 "{CONFIG_PATH}" 不存在，使用默认配置')
+    uvicorn_logger.debug(f'配置文件 "{CONFIG_PATH}" 不存在，使用默认配置')
 except Exception as e:
     config = Config()
     uvicorn_logger.error(f'配置文件 "{CONFIG_PATH}" 加载失败，使用默认配置，错误信息：\n{e}')

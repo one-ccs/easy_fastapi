@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from typing import Any
+from typing import Type, Any
 from abc import ABC, abstractmethod
+
+from redis import StrictRedis, Redis
 
 from .config import config
 
@@ -35,19 +37,19 @@ class MemoryPersistence(Persistence):
         del self.data[key]
 
 
-if config.redis.enabled:
-    from redis import StrictRedis, Redis
+class RedisPersistence(Redis, Persistence):
+    def __new__(cls):
+        return StrictRedis(
+            host=config.redis.host,
+            port=config.redis.port,
+            password=config.redis.password,
+            db=config.redis.db,
+            decode_responses=config.redis.decode_responses,
+        )
 
-    class RedisPersistence(Redis, Persistence):
-        def __new__(cls):
-            return StrictRedis(
-                host=config.redis.host,
-                port=config.redis.port,
-                password=config.redis.password,
-                db=config.redis.db,
-                decode_responses=config.redis.decode_responses,
-            )
 
-    persistence = RedisPersistence()
-else:
-    persistence = MemoryPersistence()
+persistence: Type[Persistence] = (
+    RedisPersistence()
+    if config.redis.enabled else
+    MemoryPersistence()
+)
