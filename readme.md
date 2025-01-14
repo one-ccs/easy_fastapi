@@ -73,7 +73,7 @@ project-root/
 │   │
 │   ├─ manager.py               # 项目管理文件
 │   ├─ requirements.txt         # 依赖列表
-│   └─ uvicorn_log_config.json  # uvicorn 日志配置
+│   └─ log_config.json  # uvicorn 日志配置
 │
 ├─ frontend/ # 前端项目目录
 │   └─ ...
@@ -109,9 +109,11 @@ if not verify_password(form_data.password, user.hashed_password):
    1. 切换工作目录 `cd <项目名称>/backend`
    2. 启动项目
       - 开发环境: `easy_fastapi run --reload` 等价于 `uvicorn app:app --reload`
-      - 生产环境: `easy_fastapi run` 等价于 `uvicorn app:app --log-config uvicorn_log_config.json --log-level warning`
+      - 生产环境: `easy_fastapi run` 等价于 `uvicorn app:app --log-config log_config.json --log-level warning`
 
 ## 五、开发
+
+> 注：所有脚手架命令均在 `<项目名称>/backend` 目录下执行。
 
 1. 修改 `backend/app/easy_fastapi.yaml` 中相关配置
 2. 添加或修改 `backend.app.models` 中的模型

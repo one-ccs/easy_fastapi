@@ -34,7 +34,7 @@ class Authorization(BaseModel):
     secret_key: Optional[str] = None                                  # 认证密钥
     algorithm: str = 'HS256'                                          # 认证加密算法
     access_token_expire_minutes: timedelta = timedelta(minutes=15)    # 访问令牌过期时间
-    refresh_token_expire_minutes: timedelta = timedelta(60 * 24 * 7)  # 刷新令牌过期时间
+    refresh_token_expire_minutes: timedelta = timedelta(minutes=60 * 24 * 7)  # 刷新令牌过期时间
 
     @field_validator('secret_key')
     @classmethod

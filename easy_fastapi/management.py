@@ -131,7 +131,7 @@ def db(work_dir: Path, args: argparse.Namespace) -> None:
 
 def gen(work_dir: Path, args: argparse.Namespace) -> None:
     from app import models # type: ignore
-    from app.core import Generator # type: ignore
+    from easy_fastapi.generator import Generator
 
     Generator(
         models_path=models.__path__,

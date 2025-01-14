@@ -14,7 +14,7 @@ easy_fastapi:
         # 访问令牌过期时间，默认 15 分钟
         access_token_expire_minutes: 30
         # 刷新令牌过期时间，默认 10080 分钟，即 7 天
-        refresh_token_expire_days: 10080
+        refresh_token_expire_minutes: 10080
     # 路径相关配置
     resources:
         # 上传文件保存目录
