@@ -14,12 +14,12 @@
         },
         "default_file": {
             "()": "uvicorn.logging.DefaultFormatter",
-            "fmt": "%(asctime)s %(levelname)8s - %(filename)20s:%(lineno)4d - %(message)s",
+            "fmt": "%(asctime)s %(levelname)-8s : %(filename)20s:%(lineno)4d - %(message)s",
             "use_colors": false
         },
         "access_file": {
             "()": "uvicorn.logging.AccessFormatter",
-            "fmt": "%(asctime)s %(levelname)8s - %(client_addr)20s - '%(request_line)s' %(status_code)s",
+            "fmt": "%(asctime)s %(levelname)-8s : %(client_addr)20s - '%(request_line)s' %(status_code)s",
             "use_colors": false
         }
     },

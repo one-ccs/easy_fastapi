@@ -5,10 +5,17 @@ from abc import ABC, abstractmethod
 
 from redis import StrictRedis, Redis
 
-from .config import config
+from .config import Config
 
 
-class Persistence(ABC):
+class BasePersistence(ABC):
+    _instance: Type[BaseException] | None = None
+
+    @abstractmethod
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     @abstractmethod
     def get(self, key) -> Any:
@@ -23,9 +30,12 @@ class Persistence(ABC):
         pass
 
 
-class MemoryPersistence(Persistence):
-    def __init__(self):
-        self.data = {}
+class MemoryPersistence(BasePersistence):
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.data = {}
+        return cls._instance
 
     def get(self, key):
         return self.data.get(key)
@@ -37,19 +47,29 @@ class MemoryPersistence(Persistence):
         del self.data[key]
 
 
-class RedisPersistence(Redis, Persistence):
+class RedisPersistence(Redis, BasePersistence):
     def __new__(cls):
-        return StrictRedis(
-            host=config.redis.host,
-            port=config.redis.port,
-            password=config.redis.password,
-            db=config.redis.db,
-            decode_responses=config.redis.decode_responses,
-        )
+        if cls._instance is None:
+            config = Config()
+
+            cls._instance = StrictRedis(
+                host=config.redis.host,
+                port=config.redis.port,
+                password=config.redis.password,
+                db=config.redis.db,
+                decode_responses=config.redis.decode_responses,
+            )
+        return cls._instance
 
 
-persistence: Type[Persistence] = (
-    RedisPersistence()
-    if config.redis.enabled else
-    MemoryPersistence()
-)
+class Persistence(BasePersistence):
+    def __new__(cls):
+        if cls._instance is None:
+            config = Config()
+
+            cls._instance = (
+                RedisPersistence()
+                if config.redis.enabled else
+                MemoryPersistence()
+            )
+        return cls._instance

@@ -9,7 +9,7 @@ from os import popen
 
 from easy_pyoc import AnsiColor, PathUtil, PackageUtil
 
-from .logger import logger
+from .logger import logger, uvicorn_logger
 
 
 TEMPLATES_DIR = Path(__file__).parent / 'templates'
@@ -33,11 +33,11 @@ def execute_from_command_line():
     # fastapi
     run_parser = subparsers.add_parser('run', help='FastAPI 相关命令')
     run_parser.add_argument('app', nargs='?', default='app.main:app', help='应用, 默认为 "app.main:app"')
-    run_parser.add_argument('--host', type=str, default='127.0.0.1', help='主机, 默认为 "127.0.0.1"')
+    run_parser.add_argument('--host', default='127.0.0.1', help='主机, 默认为 "127.0.0.1"')
     run_parser.add_argument('--port', type=int, default=8000, help='端口, 默认为 8000')
     run_parser.add_argument('--reload', action='store_true', help='是否自动重启服务器, 默认为 False')
-    run_parser.add_argument('--log-config', type=str, default='log_config.json', help='日志配置, 默认为 "log_config.json"')
-    run_parser.add_argument('--log-level', type=str, default='warning', help='日志级别, 默认为 "warning"')
+    run_parser.add_argument('--log-config', default='log_config.json', help='日志配置, 默认为 "log_config.json"')
+    run_parser.add_argument('--log-level', default='warning', help='日志级别, 默认为 "warning"')
 
     # database
     db_parser = subparsers.add_parser('db', help='数据库相关命令')
@@ -61,23 +61,27 @@ def execute_from_command_line():
     work_dir = Path(args.path)
 
     logger.setLevel(args.lv)
-    logger.debug(f'工作目录: {work_dir.absolute()}')
+    logger.debug(f'工作目录: "{work_dir.absolute()}"')
 
     # 添加包导入路径并设置工作路径
     PathUtil.sys_path.insert(0, str(work_dir.absolute()))
     PathUtil.set_work_dir(work_dir.absolute())
 
-    match args.cmd:
-        case 'init':
-            init(work_dir, args)
-        case 'run':
-            run(work_dir, args)
-        case 'db':
-            db(work_dir, args)
-        case 'gen':
-            gen(work_dir, args)
-        case _:
-            parser.print_help()
+    try:
+        match args.cmd:
+            case 'init':
+                init(work_dir, args)
+            case 'run':
+                run(work_dir, args)
+            case 'db':
+                db(work_dir, args)
+            case 'gen':
+                gen(work_dir, args)
+            case _:
+                parser.print_help()
+    except Exception as e:
+        logger.exception(e)
+        exit(1)
 
 
 def init(work_dir: Path, args: argparse.Namespace) -> None:
@@ -118,10 +122,10 @@ def run(work_dir: Path, args: argparse.Namespace) -> None:
 def db(work_dir: Path, args: argparse.Namespace) -> None:
     if args.db_cmd == 'init':
         with popen(f'aerich init -t {args.t}') as f:
-            print(f.read())
+            logger.info(f.read())
     elif args.db_cmd == 'init-db':
         with popen('aerich init-db') as f:
-            print(f.read())
+            logger.info(f.read())
     elif args.db_cmd == 'init-table':
         from tortoise import run_async
         from easy_fastapi import generate_schemas

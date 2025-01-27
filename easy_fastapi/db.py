@@ -1,47 +1,42 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import logging
-from typing import Type, TypeVar, Generic, Any
+from typing import Type, TypeVar, Generic, Any, Optional
 from dataclasses import dataclass
 
 from tortoise import Tortoise, Model
 from tortoise.expressions import Q
 from tortoise.query_utils import Prefetch
+from easy_pyoc import Logger
 
-from .config import config
-
+from .config import Config
 
 _TModel = TypeVar('_TModel', bound=Model)
 
 
-TORTOISE_ORM = {
-    'connections': {
-        'default': config.database.uri,
-    },
-    'apps': {
-        'models': {
-            'models': ['aerich.models', 'app.models'],
-            'default_connection': 'default',
+async def init_tortoise(config: Optional[dict] = None):
+    _config = Config()
+
+    if _config.database.echo:
+        Logger(name='tortoise', fmt='%(levelname)-8s : %(message)s')
+
+    await Tortoise.init(config=config or {
+        'connections': {
+            'default': _config.database.uri,
         },
-    },
-    'use_tz': False,
-    'timezone': config.database.timezone,
-}
+        'apps': {
+            'models': {
+                'models': ['aerich.models', 'app.models'],
+                'default_connection': 'default',
+            },
+        },
+        'use_tz': False,
+        'timezone': _config.database.timezone,
+    })
 
 
-async def init_tortoise():
-    if config.database.echo:
-        # 配置日志记录器
-        logger = logging.getLogger('tortoise')
-        logger.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler()
-        logger.addHandler(handler)
-
-    await Tortoise.init(config=TORTOISE_ORM)
-
-
-async def generate_schemas():
-    await Tortoise.init(config=TORTOISE_ORM)
+async def generate_schemas(config: dict):
+    await Tortoise.init(config=config)
     await Tortoise.generate_schemas()
 
 

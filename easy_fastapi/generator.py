@@ -3,7 +3,9 @@
 from typing import Iterator
 from pathlib import Path
 from importlib import import_module
-import pkgutil
+from pkgutil import iter_modules
+
+from .logger import logger
 
 
 class Generator:
@@ -22,7 +24,7 @@ class Generator:
 
     def get_models(self) -> list[str]:
         """获取 models"""
-        return [model_name for _, model_name, _ in pkgutil.iter_modules(self.models_path) if model_name not in self.models_ignore]
+        return [model_name for _, model_name, _ in iter_modules(self.models_path) if model_name not in self.models_ignore]
 
     def get_fields_map(self, model_name: str) -> dict[str, str]:
         """获取 model 字段"""
@@ -56,7 +58,7 @@ class Generator:
                 with open(init_path, 'a', encoding=self.encoding) as f:
                     f.write(f'from .{model_name} import *\n')
             except Exception as e:
-                print(f"生成 {file_name} 错误: {e}")
+                logger.warning(f"生成 {file_name} 错误: {e}")
 
     def generate_routers(self):
         """生成 router 代码"""
@@ -74,7 +76,7 @@ class Generator:
                     f.write(f'from .{model_name}_router import {model_name}_router as {model_name}_router\n')
                 append_routes.append(model_name)
             except Exception as e:
-                print(f"生成 {file_name} 错误: {e}")
+                logger.warning(f"生成 {file_name} 错误: {e}")
 
         try:
             main_init_path = self.work_path / '__init__.py'
@@ -87,7 +89,7 @@ class Generator:
                 for model_name in append_routes:
                     f.write(f"app.include_router({model_name}_router, prefix='/{model_name}', tags=['{model_name.title()}'])\n")
         except Exception as e:
-            print(f"追加路由到 {main_init_path} 错误: {e}")
+            logger.warning(f"追加路由到 {main_init_path} 错误: {e}")
 
     def generate_services(self):
         """生成 service 代码"""
@@ -102,7 +104,7 @@ class Generator:
                 with open(init_path, 'a', encoding=self.encoding) as f:
                     f.write(f'from . import {model_name}_service as {model_name}_service\n')
             except Exception as e:
-                print(f"生成 {file_name} 错误: {e}")
+                logger.warning(f"生成 {file_name} 错误: {e}")
 
     def build(self):
         """构建项目"""
@@ -138,7 +140,7 @@ from fastapi import APIRouter, Depends, Query
 
 from easy_fastapi import (
     Result,
-    TokenData,
+    Token,
     get_current_user,
 )
 from app.services import {model_name}_service
@@ -151,7 +153,7 @@ from app import schemas
 @{model_name}_router.get('', summary='查询 {title_model_name} 信息', response_model=Result.of(schemas.{title_model_name}))
 async def get(
     id: int,
-    current_user: TokenData = Depends(get_current_user),
+    current_user: Token = Depends(get_current_user),
 ):
     return await {model_name}_service.get(id)
 
@@ -159,7 +161,7 @@ async def get(
 @{model_name}_router.post('', summary='添加 {title_model_name}', response_model=Result.of(schemas.{title_model_name}))
 async def add(
     {model_name}: schemas.{title_model_name}Create,
-    current_user: TokenData = Depends(get_current_user),
+    current_user: Token = Depends(get_current_user),
 ):
     return await {model_name}_service.add({model_name})
 
@@ -167,7 +169,7 @@ async def add(
 @{model_name}_router.put('', summary='修改 {title_model_name}', response_model=Result.of(schemas.{title_model_name}))
 async def modify(
     {model_name}: schemas.{title_model_name}Modify,
-    current_user: TokenData = Depends(get_current_user),
+    current_user: Token = Depends(get_current_user),
 ):
     return await {model_name}_service.modify({model_name})
 
@@ -175,7 +177,7 @@ async def modify(
 @{model_name}_router.delete('', summary='删除 {title_model_name}', response_model=Result.of(int, name='Delete'))
 async def delete(
     ids: list[int] = Query(...),
-    current_user: TokenData = Depends(get_current_user),
+    current_user: Token = Depends(get_current_user),
 ):
     return await {model_name}_service.delete(ids)
 
@@ -183,7 +185,7 @@ async def delete(
 @{model_name}_router.get('/page', summary='获取 {title_model_name} 列表', response_model=Result.of(schemas.PageQueryOut[schemas.{title_model_name}]))
 async def page(
     page_query: schemas.PageQuery = Depends(),
-    current_user: TokenData = Depends(get_current_user),
+    current_user: Token = Depends(get_current_user),
 ):
     return await {model_name}_service.page(page_query)
 """
