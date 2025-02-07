@@ -4,7 +4,7 @@ from tortoise.expressions import Q
 
 from easy_fastapi import (
     FailureException,
-    Result,
+    JSONResult,
 )
 from app import schemas, models
 
@@ -15,7 +15,7 @@ async def get(id: int):
     if not db_role:
         raise FailureException('Role 不存在')
 
-    return Result(data=db_role)
+    return JSONResult(data=db_role)
 
 
 async def add(role: schemas.RoleCreate):
@@ -24,7 +24,7 @@ async def add(role: schemas.RoleCreate):
     )
     await db_role.save()
 
-    return Result(data=db_role)
+    return JSONResult(data=db_role)
 
 
 async def modify(role: schemas.RoleModify):
@@ -39,13 +39,13 @@ async def modify(role: schemas.RoleModify):
     )
     await db_role.save()
 
-    return Result(data=db_role)
+    return JSONResult(data=db_role)
 
 
 async def delete(ids: list[int]):
     count = await models.Role.filter(id__in=ids).delete()
 
-    return Result(data=count)
+    return JSONResult(data=count)
 
 
 async def page(page_query: schemas.PageQuery):
@@ -55,4 +55,4 @@ async def page(page_query: schemas.PageQuery):
         Q(role__icontains=page_query.query),
     )
 
-    return Result(data=pagination)
+    return JSONResult(data=pagination)

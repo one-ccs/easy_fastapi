@@ -1,69 +1,398 @@
-<!DOCTYPE html> <html> <head> <title>readme.md</title> <meta http-equiv="Content-type" content="text/html;charset=UTF-8"> <link rel="stylesheet" href="assets/css/main.css"> </head> <body> <div class="content-wrapper"> <h1 id="easy-fastapi" tabindex="-1">Easy FastAPI</h1> <p>基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，并且可以在编写好 <code>models</code> 文件后执行 <code>manager.py gen</code> 命令，批量生成 <code>schemas</code>、<code>routers</code>、<code>services</code> 代码，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，大大减少了项目的前期开发工作，帮助开发者快速构建和部署后端服务。</p> <p><img src="/assets/image/preview_1.jpeg" alt="alt text"></p> <h2 id="%E4%B8%80%E3%80%81%E4%B8%BB%E8%A6%81%E7%89%B9%E7%82%B9" tabindex="-1">一、主要特点</h2> <ol> <li>集成多种插件：集成了 Tortoise（数据库 ORM）、Pydantic（数据验证和序列化）、Aerich（数据库迁移）、PyJWT（JWT 认证）、PyYAML（项目配置读取）、Redis（登出黑名单） 等常用插件，提升开发效率。</li> <li>清晰的目录结构：通过明确的目录划分，如核心配置、数据库模型、路由、数据结构、事务处理和工具函数等，使项目结构清晰，便于维护和扩展。</li> <li>认证授权：内置认证授权模块，支持 JWT 认证，保障系统安全。</li> <li>数据库迁移支持：利用 Alembic 进行数据库迁移，支持自动生成迁移文件和更新数据库，确保数据库结构与代码同步。</li> <li>代码生成器：使用内置的代码生成器，在编写好 <code>models</code> 的前提下，意一键生成基本 CRUD 接口，大大减轻前期开发工作</li> </ol> <h2 id="%E4%BA%8C%E3%80%81%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E" tabindex="-1">二、目录结构说明</h2> <pre class='hljs'><code><div>project-root/
-    │
-    ├─ backend/  # 后端项目目录（python 3.12.4）
-    │   ├─ app/      # fastapi 项目目录
-    │   │   ├─ core/  # 核心配置文件
-    │   │   │   ├─ exceptions/   # 异常类目录
-    │   │   │   │   └─ *_exception.py        # 自定义异常类
-    │   │   │   │
-    │   │   │   ├─ authorize.py         # 认证授权相关配置
-    │   │   │   ├─ config.py            # 项目配置
-    │   │   │   ├─ db.py                # 数据库配置
-    │   │   │   ├─ exception_handler.py # 异常处理配置
-    │   │   │   ├─ generator.py         # 代码生成器
-    │   │   │   ├─ logger.py            # 日志配置
-    │   │   │   ├─ redis.py             # redis 配置
-    │   │   │   ├─ result.py            # 响应体数据类
-    │   │   │   └─ yaml.py              # yaml 配置
-    │   │   │
-    │   │   ├─ models/     # 数据库模型目录
-    │   │   │   ├─ *.py         # 数据库模型（user、role 等）
-    │   │   │   └─ ...
-    │   │   │
-    │   │   ├─ routers/    # 路由目录（定义路由相关信息）
-    │   │   │   ├─ *_router.py  # 路由（user_router、role_router 等）
-    │   │   │   └─ ...
-    │   │   │
-    │   │   ├─ schemas/    # pydantic 数据结构目录（定义请求响应参数结构）
-    │   │   │   ├─ *.py         # 参数模型
-    │   │   │   └─ ...
-    │   │   │
-    │   │   ├─ services/   # 事务处理目录（实现路由对应的逻辑）
-    │   │   │   ├─ *_service.py # 事务逻辑处理函数（user_service 等）
-    │   │   │   └─ ...
-    │   │   │
-    │   │   ├─ utils/      # 工具函数目录
-    │   │   │   ├─ crud_utils # 数据库 crud 工具函数
-    │   │   │   │   ├─ datetime_util.py # 日期时间相关工具类
-    │   │   │   │   ├─ object_util.py   # 对象相关工具类
-    │   │   │   │   ├─ path_util.py     # 路径相关工具类
-    │   │   │   │   ├─ string_util.py   # 字符串相关工具类
-    │   │   │   │   └─ ...
-    │   │   │   │
-    │   │   │
-    │   │   ├─ __init__.py      # 导入路、初始化配置、导入错误处理
-    │   │   ├─ easy_fastapi.py  # 配置文件
-    │   │   ├─ main.py          # 程序入口
-    │   │   └─ pyproject.toml   # Aerich 数据库迁移配置
-    │   │
-    │   ├─ logs/ # 日志目录
-    │   │   ├─  access.log      # 访问日志
-    │   │   └─  default.log     # 默认日志
-    │   │
-    │   ├─ test/  # 测试目录
-    │   │   ├─  test_authorize_router.py  # 认证授权测试文件
-    │   │   └─  test_*.py                     # 其他测试文件
-    │   │
-    │   ├─ manager.py               # 项目管理文件
-    │   ├─ requirements.txt         # 依赖列表
-    │   └─ log_config.json  # uvicorn 日志配置
-    │
-    ├─ frontend/ # 前端项目目录
-    │   └─ ...
-    │
-    ├─ license   # MIT 开源协议
-    ├─ readme.md # 工程自述
-    └─ ...
-</div></code></pre> <h2 id="%E4%B8%89%E3%80%81%E8%A7%84%E7%BA%A6" tabindex="-1">三、规约</h2> <ol> <li>所有非 200 响应均 raise 对应异常</li> </ol> <p>正例：</p> <pre class='hljs'><code><div><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> verify_password(form_data.password, user.hashed_password):
-    <span class="hljs-keyword">raise</span> FailureException(<span class="hljs-string">&#x27;密码错误&#x27;</span>) </div></code></pre> <p>反例：</p> <pre class='hljs'><code><div><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> verify_password(form_data.password, user.hashed_password):
-    <span class="hljs-keyword">return</span> Result.failure(<span class="hljs-string">&#x27;密码错误&#x27;</span>) </div></code></pre> <h2 id="%E5%9B%9B%E3%80%81%E9%83%A8%E7%BD%B2" tabindex="-1">四、部署</h2> <ol> <li>安装依赖 <code>pip install easy_fastapi</code></li> <li>初始化项目 <code>easy_fastapi init</code></li> <li>启动项目 <ol> <li>切换工作目录 <code>cd &lt;项目名称&gt;/backend</code></li> <li>启动项目 <ul> <li>开发环境: <code>easy_fastapi run --reload</code> 等价于 <code>uvicorn app:app --reload</code></li> <li>生产环境: <code>easy_fastapi run</code> 等价于 <code>uvicorn app:app --log-config log_config.json --log-level warning</code></li> </ul> </li> </ol> </li> </ol> <h2 id="%E4%BA%94%E3%80%81%E5%BC%80%E5%8F%91" tabindex="-1">五、开发</h2> <ol> <li>修改 <code>backend/app/easy_fastapi.yaml</code> 中相关配置</li> <li>添加或修改 <code>backend.app.models</code> 中的模型 <ol> <li>执行代码生成器 <code>easy_fastapi gen</code> 生成基本业务代码</li> <li>根据实际清空添加或修改业务代码</li> </ol> </li> <li>创建数据库</li> <li>初始化数据库 <ol> <li>初始化 Aerich 配置 <code>easy_fastapi db init</code></li> <li>初始化数据库 <code>easy_fastapi db init-db</code></li> <li>初始化表 <code>easy_fastapi db init-table</code></li> </ol> </li> </ol> <h2 id="%E5%85%AD%E3%80%81%E6%B5%8B%E8%AF%95" tabindex="-1">六、测试</h2> <ol> <li>在 <code>backend/test</code> 目录中添加测试文件</li> <li>运行 <code>pytest backend/test</code> 查看测试结果</li> </ol> </div> </body> </html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Easy FastAPI</title>
+        <style>
+            /* From extension vscode.github */
+            /*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+            .vscode-dark img[src$=\#gh-light-mode-only],
+            .vscode-light img[src$=\#gh-dark-mode-only],
+            .vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+            .vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+                display: none;
+            }
+        </style>
+
+
+        <link rel="stylesheet" href="/assets/css/markdown.css">
+        <link rel="stylesheet" href="/assets/css/highlight.css">
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+            .task-list-item {
+                list-style-type: none;
+            }
+
+            .task-list-item-checkbox {
+                margin-left: -20px;
+                vertical-align: middle;
+                pointer-events: none;
+            }
+        </style>
+        <style>
+            :root {
+                --color-note: #0969da;
+                --color-tip: #1a7f37;
+                --color-warning: #9a6700;
+                --color-severe: #bc4c00;
+                --color-caution: #d1242f;
+                --color-important: #8250df;
+            }
+        </style>
+        <style>
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --color-note: #2f81f7;
+                    --color-tip: #3fb950;
+                    --color-warning: #d29922;
+                    --color-severe: #db6d28;
+                    --color-caution: #f85149;
+                    --color-important: #a371f7;
+                }
+            }
+        </style>
+        <style>
+            .markdown-alert {
+                padding: 0.5rem 1rem;
+                margin-bottom: 16px;
+                color: inherit;
+                border-left: .25em solid #888;
+            }
+
+            .markdown-alert>:first-child {
+                margin-top: 0
+            }
+
+            .markdown-alert>:last-child {
+                margin-bottom: 0
+            }
+
+            .markdown-alert .markdown-alert-title {
+                display: flex;
+                font-weight: 500;
+                align-items: center;
+                line-height: 1
+            }
+
+            .markdown-alert .markdown-alert-title .octicon {
+                margin-right: 0.5rem;
+                display: inline-block;
+                overflow: visible !important;
+                vertical-align: text-bottom;
+                fill: currentColor;
+            }
+
+            .markdown-alert.markdown-alert-note {
+                border-left-color: var(--color-note);
+            }
+
+            .markdown-alert.markdown-alert-note .markdown-alert-title {
+                color: var(--color-note);
+            }
+
+            .markdown-alert.markdown-alert-important {
+                border-left-color: var(--color-important);
+            }
+
+            .markdown-alert.markdown-alert-important .markdown-alert-title {
+                color: var(--color-important);
+            }
+
+            .markdown-alert.markdown-alert-warning {
+                border-left-color: var(--color-warning);
+            }
+
+            .markdown-alert.markdown-alert-warning .markdown-alert-title {
+                color: var(--color-warning);
+            }
+
+            .markdown-alert.markdown-alert-tip {
+                border-left-color: var(--color-tip);
+            }
+
+            .markdown-alert.markdown-alert-tip .markdown-alert-title {
+                color: var(--color-tip);
+            }
+
+            .markdown-alert.markdown-alert-caution {
+                border-left-color: var(--color-caution);
+            }
+
+            .markdown-alert.markdown-alert-caution .markdown-alert-title {
+                color: var(--color-caution);
+            }
+        </style>
+
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="easy-fastapi">Easy FastAPI</h1>
+        <p>基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，并且可以在编写好 <code>models</code> 文件后执行
+            <code>manager.py gen</code> 命令，批量生成 <code>schemas</code>、<code>routers</code>、<code>services</code>
+            代码，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，大大减少了项目的前期开发工作，帮助开发者快速构建和部署后端服务。
+        </p>
+        <p><img src="/assets/image/preview.png"
+                alt="alt text"></p>
+        <h2 id="一主要特点">一、主要特点</h2>
+        <ol>
+            <li>集成多种插件：集成了 Tortoise（数据库 ORM）、Pydantic（数据验证和序列化）、Aerich（数据库迁移）、PyJWT（JWT 认证）、PyYAML（项目配置读取）、Redis（登出黑名单）
+                等常用插件，提升开发效率。</li>
+            <li>清晰的目录结构：通过明确的目录划分，如核心配置、数据库模型、路由、数据结构、事务处理和工具函数等，使项目结构清晰，便于维护和扩展。</li>
+            <li>认证授权：内置认证授权模块，支持 JWT 认证，保障系统安全。</li>
+            <li>数据库迁移支持：利用 Alembic 进行数据库迁移，支持自动生成迁移文件和更新数据库，确保数据库结构与代码同步。</li>
+            <li>代码生成器：使用内置的代码生成器，在编写好 <code>models</code> 的前提下，意一键生成基本 CRUD 接口，大大减轻前期开发工作</li>
+        </ol>
+        <h2 id="二目录结构说明">二、目录结构说明</h2>
+        <pre><code class="language-plaintext">project-root/
+│
+├─ backend/  # 后端项目目录（python 3.10.15）
+│   ├─ app/      # fastapi 项目目录
+│   │   │
+│   │   ├─ handlers/     # 处理器目录
+│   │   │   ├─ authentication.py         # 认证处理器
+│   │   │   ├─ exception.py              # 异常处理器
+│   │   │   └─ ...
+│   │   │
+│   │   ├─ models/     # 数据库模型目录
+│   │   │   ├─ *.py         # 数据库模型（user、role 等）
+│   │   │   └─ ...
+│   │   │
+│   │   ├─ routers/    # 路由目录（定义路由相关信息）
+│   │   │   ├─ *_router.py  # 路由（user_router、role_router 等）
+│   │   │   └─ ...
+│   │   │
+│   │   ├─ schemas/    # pydantic 数据结构目录（定义请求响应参数结构）
+│   │   │   ├─ *.py         # 参数模型
+│   │   │   └─ ...
+│   │   │
+│   │   ├─ services/   # 事务处理目录（实现路由对应的逻辑）
+│   │   │   ├─ *_service.py # 事务逻辑处理函数（user_service 等）
+│   │   │   └─ ...
+│   │   │
+│   │   ├─ utils/      # 工具函数目录
+│   │   │   └─ ...
+│   │   │
+│   │   ├─ __init__.py      # 导入路、初始化配置、导入错误处理
+│   │   └─ main.py          # 程序入口
+│   │
+│   ├─ logs/ # 日志目录
+│   │   ├─  access.log      # 访问日志
+│   │   └─  default.log     # 默认日志
+│   │
+│   ├─ test/  # 测试目录
+│   │   └─  test_*.py       # 测试文件
+│   │
+│   ├─ easy_fastapi.yaml    # 项目配置
+│   └─ log_config.json      # uvicorn 日志配置
+│
+├─ frontend/ # 前端项目目录
+│   └─ ...
+│
+└─ ...
+</code></pre>
+        <h2 id="三规约">三、规约</h2>
+        <ol>
+            <li>所有非 200 响应均 raise 对应异常</li>
+        </ol>
+        <p>正例：</p>
+        <pre><code class="language-python"><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">await</span> verify_password(form_data.password, user.h_pwd):
+        <span class="hljs-keyword">raise</span> FailureException(<span class="hljs-string">&#x27;密码错误&#x27;</span>)
+</code></pre>
+        <p>反例：</p>
+        <pre><code class="language-python"><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">await</span> verify_password(form_data.password, user.h_pwd):
+        <span class="hljs-keyword">return</span> JSONResult.failure(<span class="hljs-string">&#x27;密码错误&#x27;</span>)
+</code></pre>
+        <h2 id="四部署">四、部署</h2>
+        <ol>
+            <li>安装依赖 <code>pip install easy_fastapi</code></li>
+            <li>初始化项目 <code>easy_fastapi init</code></li>
+            <li>启动项目
+                <ol>
+                    <li>切换工作目录 <code>cd &lt;项目名称&gt;/backend</code></li>
+                    <li>启动项目
+                        <ul>
+                            <li>开发环境: <code>easy_fastapi run --reload</code> 等价于 <code>uvicorn app:app --reload</code>
+                            </li>
+                            <li>生产环境: <code>easy_fastapi run</code> 等价于 <code>uvicorn app:app --log-config
+                                    log_config.json --log-level warning</code></li>
+                        </ul>
+                    </li>
+                </ol>
+            </li>
+        </ol>
+        <h2 id="五开发">五、开发</h2>
+        <blockquote>
+            <p>注：所有脚手架命令均在 <code>&lt;项目名称&gt;/backend</code> 目录下执行。</p>
+        </blockquote>
+        <ol>
+            <li>修改 <code>backend/app/easy_fastapi.yaml</code> 中相关配置</li>
+            <li>添加或修改 <code>backend.app.models</code> 中的模型
+                <ol>
+                    <li>执行代码生成器 <code>easy_fastapi gen</code> 生成基本业务代码</li>
+                    <li>根据实际清空添加或修改业务代码</li>
+                </ol>
+            </li>
+            <li>创建数据库</li>
+            <li>初始化数据库
+                <ol>
+                    <li>初始化 Aerich 配置 <code>easy_fastapi db init</code></li>
+                    <li>初始化数据库 <code>easy_fastapi db init-db</code></li>
+                    <li>初始化表 <code>easy_fastapi db init-table</code></li>
+                </ol>
+            </li>
+        </ol>
+        <h2 id="六测试">六、测试</h2>
+        <ol>
+            <li>在 <code>backend/test</code> 目录中添加测试文件</li>
+            <li>运行 <code>cd backend &amp;&amp; pytest test</code> 查看测试结果</li>
+        </ol>
+        <h2 id="七附录">七、附录</h2>
+        <h3 id="1-配置模板">1. 配置模板</h3>
+        <pre><code class="language-yaml"><span class="hljs-comment"># 项目配置文件</span>
+<span class="hljs-comment"># 请在此文件中配置项目相关信息，如数据库连接信息、安全认证配置、日志配置等</span>
+<span class="hljs-comment"># 带 * 号表示必选项</span>
+
+<span class="hljs-attr">easy_fastapi:</span>
+    <span class="hljs-comment"># 是否强制所有除 500 外的状态码都返回 200 状态码，默认 False</span>
+    <span class="hljs-attr">force_200_code:</span> <span class="hljs-literal">False</span>
+    <span class="hljs-comment"># 上传文件保存目录</span>
+    <span class="hljs-attr">upload_dir:</span> <span class="hljs-string">./upload</span>
+    <span class="hljs-comment"># 单页应用配置</span>
+    <span class="hljs-attr">spa:</span>
+        <span class="hljs-comment"># 是否挂载单页应用，默认 False</span>
+        <span class="hljs-attr">enabled:</span> <span class="hljs-literal">True</span>
+        <span class="hljs-comment"># 入口文件路径</span>
+        <span class="hljs-attr">index_file:</span> <span class="hljs-string">../frontend/index.html</span>
+        <span class="hljs-comment"># 静态资源目录</span>
+        <span class="hljs-attr">static_dir:</span> <span class="hljs-string">../frontend/assets</span>
+        <span class="hljs-comment"># 静态资源 URL</span>
+        <span class="hljs-attr">static_url:</span> <span class="hljs-string">/assets</span>
+    <span class="hljs-comment"># 安全认证配置</span>
+    <span class="hljs-attr">authentication:</span>
+        <span class="hljs-comment"># * 密钥</span>
+        <span class="hljs-attr">secret_key:</span> <span class="hljs-string">easy_fastapi</span>
+        <span class="hljs-comment"># 令牌签发者, 默认 easy_fastapi</span>
+        <span class="hljs-attr">iss:</span> <span class="hljs-string">easy_fastapi</span>
+        <span class="hljs-comment"># 认证令牌 URL, 默认 /auth/token</span>
+        <span class="hljs-attr">token_url:</span> <span class="hljs-string">/token</span>
+        <span class="hljs-comment"># 登录 URL, 默认 /auth/login</span>
+        <span class="hljs-attr">login_url:</span> <span class="hljs-string">/login</span>
+        <span class="hljs-comment"># 刷新令牌 URL, 默认 /auth/refresh</span>
+        <span class="hljs-attr">refresh_url:</span> <span class="hljs-string">/refresh</span>
+        <span class="hljs-comment"># 算法，默认 HS256</span>
+        <span class="hljs-attr">algorithm:</span> <span class="hljs-string">HS256</span>
+        <span class="hljs-comment"># 访问令牌过期时间，默认 15 分钟</span>
+        <span class="hljs-attr">access_token_expire_minutes:</span> <span class="hljs-number">30</span>
+        <span class="hljs-comment"># 刷新令牌过期时间，默认 10080 分钟，即 7 天</span>
+        <span class="hljs-attr">refresh_token_expire_minutes:</span> <span class="hljs-number">10080</span>
+
+
+<span class="hljs-attr">fastapi:</span>
+    <span class="hljs-comment"># root_path，默认 &#x27;&#x27;</span>
+    <span class="hljs-attr">root_path:</span> <span class="hljs-string">/api</span>
+    <span class="hljs-comment"># 文档配置，需在 fastapi 实例化时手动传参</span>
+    <span class="hljs-attr">swagger:</span>
+        <span class="hljs-comment"># 文档标题</span>
+        <span class="hljs-attr">title:</span> <span class="hljs-string">Easy</span> <span class="hljs-string">FastAPI</span>
+        <span class="hljs-comment"># 文档描述</span>
+        <span class="hljs-attr">description:</span> <span class="hljs-string">基于</span> <span class="hljs-string">FastAPI</span> <span class="hljs-string">开发的后端框架，集成了</span> <span class="hljs-string">Tortoise</span> <span class="hljs-string">ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis</span> <span class="hljs-string">等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。</span>
+        <span class="hljs-comment"># 文档版本</span>
+        <span class="hljs-attr">version:</span> <span class="hljs-number">0.12</span><span class="hljs-number">.0</span>
+        <span class="hljs-comment"># 联系信息</span>
+        <span class="hljs-attr">contact:</span>
+            <span class="hljs-comment"># 联系人</span>
+            <span class="hljs-attr">name:</span> <span class="hljs-string">one-ccs</span>
+            <span class="hljs-comment"># 联系人 URL</span>
+            <span class="hljs-attr">url:</span> <span class="hljs-string">~</span>
+            <span class="hljs-comment"># 联系人邮箱</span>
+            <span class="hljs-attr">email:</span> <span class="hljs-string">one-ccs@foxmail.com</span>
+        <span class="hljs-comment"># 许可证信息</span>
+        <span class="hljs-attr">license:</span>
+            <span class="hljs-comment"># 许可证名称</span>
+            <span class="hljs-attr">name:</span> <span class="hljs-string">开源协议：MIT</span>
+            <span class="hljs-comment"># 许可证 URL</span>
+            <span class="hljs-attr">url:</span> <span class="hljs-string">https://github.com/one-ccs/easy_fastapi?tab=MIT-1-ov-file#readme</span>
+        <span class="hljs-comment"># 用于获取访问令牌的 URL，默认 /token</span>
+        <span class="hljs-attr">token_url:</span> <span class="hljs-string">/token</span>
+        <span class="hljs-comment"># 默认 /docs</span>
+        <span class="hljs-attr">docs_url:</span> <span class="hljs-string">/api-docs</span>
+        <span class="hljs-comment"># 默认 /redoc</span>
+        <span class="hljs-attr">redoc_url:</span> <span class="hljs-string">/api-redoc</span>
+        <span class="hljs-comment"># 默认 /openapi.json</span>
+        <span class="hljs-attr">openapi_url:</span> <span class="hljs-string">/api-json</span>
+    <span class="hljs-comment"># 中间件配置</span>
+    <span class="hljs-attr">middleware:</span>
+        <span class="hljs-comment"># 跨域配置</span>
+        <span class="hljs-attr">cors:</span>
+            <span class="hljs-comment"># 是否启用跨域，默认 False</span>
+            <span class="hljs-attr">enabled:</span> <span class="hljs-literal">False</span>
+            <span class="hljs-comment"># 允许的域列表，默认 [&#x27;*&#x27;]</span>
+            <span class="hljs-attr">allow_origins:</span>
+                <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;*&#x27;</span>
+            <span class="hljs-comment"># 是否允许请求携带 cookie，默认 True</span>
+            <span class="hljs-attr">allow_credentials:</span> <span class="hljs-literal">True</span>
+            <span class="hljs-comment"># 允许的请求方法，默认 [&#x27;*&#x27;]</span>
+            <span class="hljs-attr">allow_methods:</span>
+                <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;*&#x27;</span>
+            <span class="hljs-comment"># 允许的请求头，默认 [&#x27;*&#x27;]</span>
+            <span class="hljs-attr">allow_headers:</span>
+                <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;*&#x27;</span>
+        <span class="hljs-comment"># 强制所有传入请求必须是 https 或 wss</span>
+        <span class="hljs-attr">https_redirect:</span>
+            <span class="hljs-attr">enabled:</span> <span class="hljs-literal">False</span>
+        <span class="hljs-comment"># 强制所有传入请求都必须正确设置 Host 请求头，以防 HTTP 主机头攻击</span>
+        <span class="hljs-attr">trusted_host:</span>
+            <span class="hljs-attr">enabled:</span> <span class="hljs-literal">False</span>
+            <span class="hljs-attr">allowed_hosts:</span>
+                <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;*&#x27;</span>
+        <span class="hljs-comment"># gzip 压缩配置</span>
+        <span class="hljs-attr">gzip:</span>
+            <span class="hljs-attr">enabled:</span> <span class="hljs-literal">False</span>
+            <span class="hljs-attr">minimum_size:</span> <span class="hljs-number">1000</span>
+            <span class="hljs-attr">compresslevel:</span> <span class="hljs-number">5</span>
+
+
+<span class="hljs-comment"># 数据库配置</span>
+<span class="hljs-attr">database:</span>
+    <span class="hljs-comment"># * 数据库用户名</span>
+    <span class="hljs-attr">username:</span> <span class="hljs-string">root</span>
+    <span class="hljs-comment"># * 数据库密码</span>
+    <span class="hljs-attr">password:</span> <span class="hljs-string">&#x27;123456&#x27;</span>
+    <span class="hljs-comment"># * 数据库名称</span>
+    <span class="hljs-attr">database:</span> <span class="hljs-string">easy_fastapi</span>
+    <span class="hljs-comment"># 数据库主机名，默认 127.0.0.1</span>
+    <span class="hljs-attr">host:</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>
+    <span class="hljs-comment"># 数据库端口号，默认 3306</span>
+    <span class="hljs-attr">port:</span> <span class="hljs-number">3306</span>
+    <span class="hljs-comment"># 是否打印日志，默认 False</span>
+    <span class="hljs-attr">echo:</span> <span class="hljs-literal">False</span>
+    <span class="hljs-comment"># 时区，默认 Asia/Chongqing</span>
+    <span class="hljs-attr">timezone:</span> <span class="hljs-string">Asia/Chongqing</span>
+
+
+<span class="hljs-comment"># Redis 配置</span>
+<span class="hljs-attr">redis:</span>
+    <span class="hljs-comment"># 是否启用，默认 False</span>
+    <span class="hljs-attr">enabled:</span> <span class="hljs-literal">False</span>
+    <span class="hljs-comment"># * 主机名，默认 None</span>
+    <span class="hljs-attr">host:</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>
+    <span class="hljs-comment"># 密码，默认 None</span>
+    <span class="hljs-attr">password:</span> <span class="hljs-string">~</span>
+    <span class="hljs-comment"># 端口号，默认 6379</span>
+    <span class="hljs-attr">port:</span> <span class="hljs-number">6379</span>
+    <span class="hljs-comment"># 数据库号，默认 0</span>
+    <span class="hljs-attr">db:</span> <span class="hljs-number">0</span>
+    <span class="hljs-comment"># 是否解码响应，默认 True</span>
+    <span class="hljs-attr">decode_responses:</span> <span class="hljs-literal">True</span>
+</code></pre>
+    </body>
+</html>

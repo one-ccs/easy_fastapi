@@ -9,7 +9,7 @@ from os import popen
 
 from easy_pyoc import AnsiColor, PathUtil, PackageUtil
 
-from .logger import logger, uvicorn_logger
+from .logger import logger
 
 
 TEMPLATES_DIR = Path(__file__).parent / 'templates'
@@ -95,12 +95,12 @@ def init(work_dir: Path, args: argparse.Namespace) -> None:
     shutil.copytree(TEMPLATES_DIR, project_path)
     project_path.joinpath('backend', 'logs').mkdir(parents=True, exist_ok=True)
 
-    logger.info(
+    print(
         '项目初始化完成，启动项目:'
-        f'{AnsiColor(AnsiColor.FORE_GREEN, bold=True)}'
+        f'{AnsiColor.FORE_GREEN + AnsiColor.BOLD}'
         f'\n    cd {project_path}/backend'
         '\n    easy_fastapi run --reload'
-        f'{AnsiColor(AnsiColor.FORE_RESET, AnsiColor.BACK_RESET)}'
+        f'{AnsiColor.RESET_ALL}'
     )
 
 

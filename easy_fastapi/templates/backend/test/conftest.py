@@ -14,7 +14,7 @@ def client():
 @pytest.fixture(scope='package')
 def login_client(client: TestClient):
     response = client.post(
-        '/token',
+        '/auth/token',
         data={'grant_type': 'password', 'username': 'user', 'password': '123'},
     )
     access_token = response.json()['access_token']

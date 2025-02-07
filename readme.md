@@ -2,7 +2,7 @@
 
 基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，并且可以在编写好 `models` 文件后执行 `manager.py gen` 命令，批量生成 `schemas`、`routers`、`services` 代码，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，大大减少了项目的前期开发工作，帮助开发者快速构建和部署后端服务。
 
-![alt text](easy_fastapi/templates/frontend/assets/image/preview_1.jpeg)
+![alt text](easy_fastapi/templates/frontend/assets/image/preview.png)
 
 ## 一、主要特点
 
@@ -17,21 +17,13 @@
 ```plaintext
 project-root/
 │
-├─ backend/  # 后端项目目录（python 3.12.4）
+├─ backend/  # 后端项目目录（python 3.10.15）
 │   ├─ app/      # fastapi 项目目录
-│   │   ├─ core/  # 核心配置文件
-│   │   │   ├─ exceptions/   # 异常类目录
-│   │   │   │   └─ *_exception.py        # 自定义异常类
-│   │   │   │
-│   │   │   ├─ authorize.py         # 认证授权相关配置
-│   │   │   ├─ config.py            # 项目配置
-│   │   │   ├─ db.py                # 数据库配置
-│   │   │   ├─ exception_handler.py # 异常处理配置
-│   │   │   ├─ generator.py         # 代码生成器
-│   │   │   ├─ logger.py            # 日志配置
-│   │   │   ├─ redis.py             # redis 配置
-│   │   │   ├─ result.py            # 响应体数据类
-│   │   │   └─ yaml.py              # yaml 配置
+│   │   │
+│   │   ├─ handlers/     # 处理器目录
+│   │   │   ├─ authentication.py         # 认证处理器
+│   │   │   ├─ exception.py              # 异常处理器
+│   │   │   └─ ...
 │   │   │
 │   │   ├─ models/     # 数据库模型目录
 │   │   │   ├─ *.py         # 数据库模型（user、role 等）
@@ -50,36 +42,24 @@ project-root/
 │   │   │   └─ ...
 │   │   │
 │   │   ├─ utils/      # 工具函数目录
-│   │   │   ├─ crud_utils # 数据库 crud 工具函数
-│   │   │   │   ├─ datetime_util.py # 日期时间相关工具类
-│   │   │   │   ├─ object_util.py   # 对象相关工具类
-│   │   │   │   ├─ path_util.py     # 路径相关工具类
-│   │   │   │   ├─ string_util.py   # 字符串相关工具类
-│   │   │   │   └─ ...
-│   │   │   │
+│   │   │   └─ ...
 │   │   │
 │   │   ├─ __init__.py      # 导入路、初始化配置、导入错误处理
-│   │   ├─ easy_fastapi.py  # 配置文件
-│   │   ├─ main.py          # 程序入口
-│   │   └─ pyproject.toml   # Aerich 数据库迁移配置
+│   │   └─ main.py          # 程序入口
 │   │
 │   ├─ logs/ # 日志目录
 │   │   ├─  access.log      # 访问日志
 │   │   └─  default.log     # 默认日志
 │   │
 │   ├─ test/  # 测试目录
-│   │   ├─  test_authorize_router.py  # 认证授权测试文件
-│   │   └─  test_*.py                     # 其他测试文件
+│   │   └─  test_*.py       # 测试文件
 │   │
-│   ├─ manager.py               # 项目管理文件
-│   ├─ requirements.txt         # 依赖列表
-│   └─ log_config.json  # uvicorn 日志配置
+│   ├─ easy_fastapi.yaml    # 项目配置
+│   └─ log_config.json      # uvicorn 日志配置
 │
 ├─ frontend/ # 前端项目目录
 │   └─ ...
 │
-├─ license   # MIT 开源协议
-├─ readme.md # 工程自述
 └─ ...
 ```
 
@@ -90,15 +70,15 @@ project-root/
 正例：
 
 ```python
-if not verify_password(form_data.password, user.hashed_password):
+if not await verify_password(form_data.password, user.h_pwd):
         raise FailureException('密码错误')
 ```
 
 反例：
 
 ```python
-if not verify_password(form_data.password, user.hashed_password):
-        return Result.failure('密码错误')
+if not await verify_password(form_data.password, user.h_pwd):
+        return JSONResult.failure('密码错误')
 ```
 
 ## 四、部署
@@ -155,9 +135,7 @@ easy_fastapi:
         # 静态资源 URL
         static_url: /assets
     # 安全认证配置
-    authorize:
-        # 是否启用认证授权，默认 True
-        enabled: True
+    authentication:
         # * 密钥
         secret_key: easy_fastapi
         # 令牌签发者, 默认 easy_fastapi

@@ -5,10 +5,11 @@ from tortoise.expressions import Q
 from easy_pyoc import Magic
 
 from easy_fastapi import ExtendedCRUD
+from easy_fastapi.authentication import UserMixin
 from .role import Role
 
 
-class User(Magic, ExtendedCRUD, Model):
+class User(Magic, UserMixin, ExtendedCRUD, Model):
     """用户表"""
     _str_exclude = {'hashed_password'}
     _str_include = {'_roles'}
@@ -26,6 +27,19 @@ class User(Magic, ExtendedCRUD, Model):
         'models.Role', related_name='users', through='user_role', description='用户角色',
     )
 
+    @property
+    def identity(self) -> str:
+        return self.username or self.email
+
+    @property
+    def h_pwd(self) -> str:
+        return self.hashed_password
+
+    @property
+    def scopes(self) -> list[str]:
+        """获取用户权限"""
+        return [role.role for role in self.roles]
+
     @staticmethod
     async def by_username(username: str):
         return await User.filter(username=username).prefetch_related('roles').first()
@@ -39,11 +53,3 @@ class User(Magic, ExtendedCRUD, Model):
         return await User.filter(
             Q(username=username_or_email) | Q(email=username_or_email),
         ).prefetch_related('roles').first()
-
-    def get_permissions(self) -> list[str]:
-        """获取用户权限"""
-        return [role.role for role in self.roles]
-
-    def has_permission(self, permission: str) -> bool:
-        """判断用户是否有指定权限"""
-        return permission in self.get_permissions()

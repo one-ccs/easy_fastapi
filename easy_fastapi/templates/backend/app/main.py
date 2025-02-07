@@ -1,7 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
-from easy_fastapi import EasyFastAPI, Config
+from easy_fastapi import EasyFastAPI, Config, init_tortoise
+from easy_fastapi.authentication import EasyAuthentication
+
+from .handlers.authentication import MyAuthHandler
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 启动事件
+
+    # 初始化数据库
+    await init_tortoise()
+    yield
+    # 关闭事件
+    pass
 
 
 config = Config()
@@ -22,5 +38,7 @@ app = FastAPI(
         'name': config.fastapi.swagger.license.name,
         'url': config.fastapi.swagger.license.url,
     },
+    lifespan=lifespan,
 )
 easy_fastapi = EasyFastAPI(app)
+auth = EasyAuthentication(app, authentication_handler=MyAuthHandler())

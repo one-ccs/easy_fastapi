@@ -13,25 +13,21 @@ from easy_pyoc import PathUtil
 
 from .config import Config
 from .exception.handlers import binding_exception_handler
-from .db import init_tortoise
-from .authorize import EasyFastAPIAuthorize
 
 
 class EasyFastAPI:
 
-    def __init__(self, app: FastAPI, tortoise_config: Optional[dict] = None):
+    def __init__(
+            self,
+            app: FastAPI,
+            tortoise_config: Optional[dict] = None,
+        ):
         self.app = app
         self.tortoise_config = tortoise_config
 
         self.config = Config()
 
-        self._authorize: Optional[EasyFastAPIAuthorize] = None
-
         self.init_app(app)
-
-    @property
-    def auth(self):
-        return self._authorize
 
     def init_app(self, app: FastAPI):
         if hasattr(app, 'easy_fastapi'):
@@ -40,8 +36,7 @@ class EasyFastAPI:
         app.easy_fastapi = self
         app.root_path    = self.config.fastapi.root_path
 
-        if self.config.easy_fastapi.authorize.enabled:
-            self._authorize = EasyFastAPIAuthorize(app)
+        binding_exception_handler(app)
 
         # 绑定 http 中间件，强制返回 200 状态码
         if self.config.easy_fastapi.force_success_code:
@@ -99,5 +94,3 @@ class EasyFastAPI:
                 minimum_size=self.config.fastapi.middleware.gzip.minimum_size,
                 compresslevel=self.config.fastapi.middleware.gzip.compress_level,
             )
-
-        binding_exception_handler(app)

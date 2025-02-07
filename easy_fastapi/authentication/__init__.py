@@ -1,25 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from .authorize import (
+from .global_var import (
     AUTH_HEADER_NAME,
     AUTH_TYPE,
+)
+from .authentication import EasyAuthentication
+from .models import UserMixin
+from .schemas import (
     Token,
-    TokenUser,
-    UserMixin,
-    EasyFastAPIAuthorize,
+    BaseUser,
+)
+from .utils import (
     encrypt_password,
     verify_password,
     create_access_token,
     create_refresh_token,
     decode_token,
 )
-from starlette.authentication import (
-    AuthenticationBackend,
-    AuthCredentials,
-    AuthenticationError,
+from .handlers import (
+    AuthenticationHandler,
+    AuthHandler,
 )
-from starlette.middleware.authentication import AuthenticationMiddleware
+
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import computed_field
 from jwt import (
     ExpiredSignatureError,
     InvalidSignatureError,
@@ -31,21 +35,20 @@ from jwt import (
 __all__ = [
     'AUTH_HEADER_NAME',
     'AUTH_TYPE',
-    'Token',
-    'TokenUser',
+    'EasyAuthentication',
     'UserMixin',
-    'EasyFastAPIAuthorize',
+    'Token',
+    'BaseUser',
     'encrypt_password',
     'verify_password',
     'create_access_token',
     'create_refresh_token',
     'decode_token',
+    'AuthenticationHandler',
+    'AuthHandler',
 
-    'AuthenticationBackend',
-    'AuthCredentials',
-    'AuthenticationError',
-    'AuthenticationMiddleware',
     'OAuth2PasswordRequestForm',
+    'computed_field',
     'ExpiredSignatureError',
     'InvalidSignatureError',
     'DecodeError',

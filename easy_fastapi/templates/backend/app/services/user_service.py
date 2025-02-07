@@ -4,10 +4,33 @@ from tortoise.expressions import Q
 
 from easy_fastapi import (
     FailureException,
-    Result,
-    encrypt_password,
+    JSONResult,
 )
+from easy_fastapi.authentication import encrypt_password
 from app import schemas, models
+
+
+async def register(form_data: schemas.Register):
+    if not form_data.username and not form_data.email:
+        raise FailureException('用户名和邮箱不能同时为空')
+
+    if form_data.username and await models.User.by_username(form_data.username):
+        raise FailureException('用户名已存在')
+
+    if form_data.email and await models.User.by_email(form_data.email):
+        raise FailureException('邮箱已存在')
+
+    db_user = models.User(
+        **vars(form_data),
+        hashed_password=await encrypt_password(form_data.password),
+    )
+    await db_user.save()
+
+    default_role, _ = await models.Role.get_or_create(role='user', role_desc='用户')
+    await db_user.roles.add(default_role)
+    await db_user.fetch_related('roles')
+
+    return JSONResult('注册成功', data=db_user)
 
 
 async def get(id: int):
@@ -16,7 +39,7 @@ async def get(id: int):
     if not db_user:
         raise FailureException('用户不存在')
 
-    return Result(data=db_user)
+    return JSONResult(data=db_user)
 
 
 async def add(user: schemas.UserCreate):
@@ -31,14 +54,14 @@ async def add(user: schemas.UserCreate):
 
     db_user = models.User(
         **user.model_dump(exclude={'password'}, exclude_unset=True),
-        hashed_password=encrypt_password(user.password),
+        hashed_password=await encrypt_password(user.password),
     )
     await db_user.save()
 
     default_role, _ = await models.Role.get_or_create(role='user', role_desc='用户')
     await db_user.roles.add(default_role)
 
-    return Result(data=db_user)
+    return JSONResult(data=db_user)
 
 
 async def modify(user: schemas.UserModify):
@@ -48,20 +71,20 @@ async def modify(user: schemas.UserModify):
         raise FailureException('用户不存在')
 
     if user.password:
-        db_user.hashed_password = encrypt_password(user.password)
+        db_user.hashed_password = await encrypt_password(user.password)
 
     db_user.update_from_dict(
         user.model_dump(exclude={'id'}, exclude_unset=True),
     )
     await db_user.save()
 
-    return Result(data=db_user)
+    return JSONResult(data=db_user)
 
 
 async def delete(ids: list[int]):
     count = await models.User.filter(id__in=ids).delete()
 
-    return Result(data=count)
+    return JSONResult(data=count)
 
 
 async def page(page_query: schemas.PageQuery):
@@ -71,7 +94,7 @@ async def page(page_query: schemas.PageQuery):
         ('roles', ),
         Q(username__icontains=page_query.query) | Q(email__icontains=page_query.query),
     )
-    return Result(data=pagination)
+    return JSONResult(data=pagination)
 
 
 async def get_user_roles(id: int):
@@ -80,4 +103,4 @@ async def get_user_roles(id: int):
     if not db_user:
         raise FailureException('用户不存在')
 
-    return Result(data=db_user.roles)
+    return JSONResult(data=db_user.roles)

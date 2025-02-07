@@ -136,57 +136,50 @@ class {title_model_name}Modify({title_model_name}Base):
 
 ROUTER_TEMPLATE = """#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Query
 
 from easy_fastapi import (
     Result,
+    JSONResult,
     Token,
     get_current_user,
 )
 from app.services import {model_name}_service
-from app import schemas
+from app import schemas, auth
 
 
 {model_name}_router = APIRouter()
 
 
-@{model_name}_router.get('', summary='查询 {title_model_name} 信息', response_model=Result.of(schemas.{title_model_name}))
-async def get(
-    id: int,
-    current_user: Token = Depends(get_current_user),
-):
+@{model_name}_router.get('', summary='查询 {title_model_name} 信息', response_model=Result[schemas.{title_model_name}])
+@auth.require
+async def get(id: int):
     return await {model_name}_service.get(id)
 
 
-@{model_name}_router.post('', summary='添加 {title_model_name}', response_model=Result.of(schemas.{title_model_name}))
-async def add(
-    {model_name}: schemas.{title_model_name}Create,
-    current_user: Token = Depends(get_current_user),
-):
+@{model_name}_router.post('', summary='添加 {title_model_name}', response_model=Result[schemas.{title_model_name}])
+@auth.require
+async def add({model_name}: schemas.{title_model_name}Create):
     return await {model_name}_service.add({model_name})
 
 
-@{model_name}_router.put('', summary='修改 {title_model_name}', response_model=Result.of(schemas.{title_model_name}))
-async def modify(
-    {model_name}: schemas.{title_model_name}Modify,
-    current_user: Token = Depends(get_current_user),
-):
+@{model_name}_router.put('', summary='修改 {title_model_name}', response_model=Result[schemas.{title_model_name}])
+@auth.require
+async def modify({model_name}: schemas.{title_model_name}Modify):
     return await {model_name}_service.modify({model_name})
 
 
-@{model_name}_router.delete('', summary='删除 {title_model_name}', response_model=Result.of(int, name='Delete'))
-async def delete(
-    ids: list[int] = Query(...),
-    current_user: Token = Depends(get_current_user),
-):
+@{model_name}_router.delete('', summary='删除 {title_model_name}', response_model=Result[int])
+@auth.require
+async def delete(ids: list[int] = Query(...)):
     return await {model_name}_service.delete(ids)
 
 
-@{model_name}_router.get('/page', summary='获取 {title_model_name} 列表', response_model=Result.of(schemas.PageQueryOut[schemas.{title_model_name}]))
-async def page(
-    page_query: schemas.PageQuery = Depends(),
-    current_user: Token = Depends(get_current_user),
-):
+@{model_name}_router.get('/page', summary='获取 {title_model_name} 列表', response_model=Result[schemas.PageQueryOut[schemas.{title_model_name}]])
+@auth.require
+async def page(page_query: Annotated[schemas.PageQuery, Depends()]):
     return await {model_name}_service.page(page_query)
 """
 
@@ -196,7 +189,7 @@ from tortoise.expressions import Q
 
 from easy_fastapi import (
     FailureException,
-    Result,
+    JSONResult,
 )
 from app import schemas, models
 
@@ -207,7 +200,7 @@ async def get(id: int):
     if not db_{model_name}:
         raise FailureException('{title_model_name} 不存在')
 
-    return Result(data=db_{model_name})
+    return JSONResult(data=db_{model_name})
 
 
 async def add({model_name}: schemas.{title_model_name}Create):
@@ -216,7 +209,7 @@ async def add({model_name}: schemas.{title_model_name}Create):
     )
     await db_{model_name}.save()
 
-    return Result(data=db_{model_name})
+    return JSONResult(data=db_{model_name})
 
 
 async def modify({model_name}: schemas.{title_model_name}Modify):
@@ -231,13 +224,13 @@ async def modify({model_name}: schemas.{title_model_name}Modify):
     )
     await db_{model_name}.save()
 
-    return Result(data=db_{model_name})
+    return JSONResult(data=db_{model_name})
 
 
 async def delete(ids: list[int]):
     count = await models.{title_model_name}.filter(id__in=ids).delete()
 
-    return Result(data=count)
+    return JSONResult(data=count)
 
 
 async def page(page_query: schemas.PageQuery):
@@ -246,5 +239,5 @@ async def page(page_query: schemas.PageQuery):
         page_query.size,
     )
 
-    return Result(data=pagination)
+    return JSONResult(data=pagination)
 """

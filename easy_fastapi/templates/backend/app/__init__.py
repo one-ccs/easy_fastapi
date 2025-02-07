@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from .main import app, easy_fastapi
+from .main import app, auth
 
 
-__all__ = ['app', 'easy_fastapi']
+__all__ = ['app', 'auth']
 
 
 # 绑定错误处理
@@ -15,7 +15,6 @@ __all__ = ['app', 'easy_fastapi']
 # 导入路由
 from .routers import user_router as user_router
 from .routers import role_router as role_router
-
 
 app.include_router(user_router, prefix='/user', tags=['用户'])
 app.include_router(role_router, prefix='/role', tags=['角色'])

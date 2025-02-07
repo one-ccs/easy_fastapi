@@ -5,14 +5,12 @@ easy_fastapi:
         index_file: ../frontend/index.html
         static_dir: ../frontend/assets
         static_url: /assets
-    authorize:
-        enabled: True
+    authentication:
         secret_key: easy_fastapi
 
 
 # FastAPI 配置
 fastapi:
-    root_path: /api
     swagger:
         title: Easy FastAPI
         description: 基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。

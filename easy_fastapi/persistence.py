@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from typing import Type, Any
+from typing import Optional, Any
 from abc import ABC, abstractmethod
 
 from redis import StrictRedis, Redis
@@ -9,7 +9,7 @@ from .config import Config
 
 
 class BasePersistence(ABC):
-    _instance: Type[BaseException] | None = None
+    _instance: Optional['BasePersistence'] = None
 
     @abstractmethod
     def __new__(cls):

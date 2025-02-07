@@ -45,24 +45,18 @@ class BaseModel(Magic, _BaseModel): ...
 
 # easy_fastapi 配置
 
-class Authorize(BaseModel):
+class Authentication(BaseModel):
     """认证配置类"""
     secret_key: str = 'easy_fastapi'                                          # 认证密钥
     iss: str = 'easy_fastapi'                                                 # 令牌签发者
     token_url: str = '/auth/token'                                            # 认证令牌 URL
-    login_url: str = '/auth/login'                                            # 登录 URL
     refresh_url: str = '/auth/refresh'                                        # 刷新令牌 URL
+    login_url: str = '/auth/login'                                            # 登录 URL
+    logout_url: str = '/auth/logout'                                          # 登出 URL
+    register_url: str = '/auth/register'                                      # 注册 URL
     algorithm: str = 'HS256'                                                  # 认证加密算法
     access_token_expire_minutes: timedelta = timedelta(minutes=15)            # 访问令牌过期时间
     refresh_token_expire_minutes: timedelta = timedelta(minutes=60 * 24 * 7)  # 刷新令牌过期时间
-    enabled: bool = True                                                      # 是否启用认证
-
-    @field_validator('enabled')
-    @classmethod
-    def validate_enabled(cls, v: bool, values: ValidationInfo) -> bool:
-        if v and not values.data.get('secret_key'):
-            raise ValueError('请配置 "secret_key"')
-        return v
 
     @field_validator('secret_key')
     @classmethod
@@ -113,7 +107,7 @@ class EasyFastAPI(BaseModel):
     force_success_code: bool = False  # 是否强制返回 200 状态码
     upload_dir: Optional[str] = None  # 上传文件目录
     spa: SPA = SPA()
-    authorize: Authorize = Authorize()
+    authentication: Authentication = Authentication()
 
     @field_serializer('upload_dir')
     def serialize_upload_dir(self, upload_dir: Optional[str]) -> str:

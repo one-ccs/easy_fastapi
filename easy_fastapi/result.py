@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from typing import Any
+from typing import Any, Generic, TypeVar, Optional
 from uuid import uuid4
 
 from fastapi.responses import JSONResponse
@@ -8,6 +8,17 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
 from .logger import uvicorn_logger
+
+
+DataT = TypeVar('DataT')
+
+
+class Result(BaseModel, Generic[DataT]):
+    """返回 ResponseResult"""
+
+    code: int
+    message: str
+    data: Optional[DataT] | None
 
 
 class JSONResponseResult(object):
@@ -73,7 +84,7 @@ class JSONResponseResult(object):
         return cls(message, data=None, code=405)
 
 
-class Result(object):
+class JSONResult(object):
     """返回 dict"""
 
     def __new__(cls, message: str = '请求成功', *, data: Any | None = None, code: int = 200) -> dict:
