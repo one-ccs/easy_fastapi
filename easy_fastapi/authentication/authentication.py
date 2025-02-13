@@ -178,7 +178,7 @@ class EasyAuthentication:
         Example:
             ```python
             from fastapi import FastAPI
-            from easy_fastapi import EasyAuthentication
+            from easy_fastapi.authentication import EasyAuthentication
 
             app = FastAPI()
             auth = EasyAuthentication(app)
@@ -237,7 +237,7 @@ class EasyAuthentication:
         Example:
             ```python
             from fastapi import FastAPI
-            from easy_fastapi import EasyAuthentication
+            from easy_fastapi.authentication import EasyAuthentication
 
             app = FastAPI()
             auth = EasyAuthentication(app)
@@ -266,7 +266,7 @@ class EasyAuthentication:
         Example:
             ```python
             from fastapi import FastAPI
-            from easy_fastapi import EasyAuthentication, Token
+            from easy_fastapi.authentication import EasyAuthentication, Token
 
             app = FastAPI()
             auth = EasyAuthentication(app)
@@ -295,7 +295,7 @@ class EasyAuthentication:
         Example:
             ```python
             from fastapi import FastAPI
-            from easy_fastapi import EasyAuthentication
+            from easy_fastapi.authentication import EasyAuthentication
             from app.models import User
 
             app = FastAPI()

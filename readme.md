@@ -164,7 +164,7 @@ fastapi:
         # 文档描述
         description: 基于 FastAPI 开发的后端框架，集成了 Tortoise ORM、Pydantic、Aerich、PyJWT、PyYAML、Redis 等插件，旨在提供一个高效、易用的后端开发环境。该框架通过清晰的目录结构和模块化设计，帮助开发者快速构建和部署后端服务。
         # 文档版本
-        version: 0.12.0
+        version: ~
         # 联系信息
         contact:
             # 联系人

@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from easy_fastapi import EasyFastAPI, Config, init_tortoise
 from easy_fastapi.authentication import EasyAuthentication
+from easy_pyoc import PackageUtil
 
 from .handlers.authentication import MyAuthHandler
 
@@ -28,7 +29,7 @@ app = FastAPI(
     openapi_url=config.fastapi.swagger.openapi_url,
     title=config.fastapi.swagger.title,
     description=config.fastapi.swagger.description,
-    version=config.fastapi.swagger.version,
+    version=PackageUtil.get_version('easy_fastapi'),
     contact={
         'name': config.fastapi.swagger.contact.name,
         'url': config.fastapi.swagger.contact.url,

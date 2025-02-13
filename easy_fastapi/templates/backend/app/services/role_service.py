@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from tortoise.expressions import Q
+from tortoise.exceptions import IntegrityError
 
 from easy_fastapi import (
     FailureException,
@@ -37,7 +38,10 @@ async def modify(role: schemas.RoleModify):
     db_role.update_from_dict(
         role.model_dump(exclude={'id'}, exclude_unset=True),
     )
-    await db_role.save()
+    try:
+        await db_role.save()
+    except IntegrityError:
+        raise FailureException('角色名称已存在')
 
     return JSONResult(data=db_role)
 

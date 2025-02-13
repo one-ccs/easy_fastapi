@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from tortoise.expressions import Q
+from tortoise.exceptions import IntegrityError
 
 from easy_fastapi import (
     FailureException,
@@ -76,7 +77,10 @@ async def modify(user: schemas.UserModify):
     db_user.update_from_dict(
         user.model_dump(exclude={'id'}, exclude_unset=True),
     )
-    await db_user.save()
+    try:
+        await db_user.save()
+    except IntegrityError:
+        raise FailureException('用户名或邮箱已存在')
 
     return JSONResult(data=db_user)
 

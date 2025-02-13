@@ -186,6 +186,7 @@ async def page(page_query: Annotated[schemas.PageQuery, Depends()]):
 SERVICE_TEMPLATE = """#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from tortoise.expressions import Q
+from tortoise.exceptions import IntegrityError
 
 from easy_fastapi import (
     FailureException,
@@ -222,7 +223,10 @@ async def modify({model_name}: schemas.{title_model_name}Modify):
     db_{model_name}.update_from_dict(
         {model_name}.model_dump(exclude={{'id'}}, exclude_unset=True),
     )
-    await db_{model_name}.save()
+    try:
+        await db_{model_name}.save()
+    except IntegrityError:
+        raise FailureException('{title_model_name} 已存在')
 
     return JSONResult(data=db_{model_name})
 
