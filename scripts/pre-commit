@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# easy_fastapi pre-commit hook
+# 运行 ruff check + ruff format --check + pytest
+# 跳过：git commit --no-verify 或设置 EFA_SKIP_HOOKS=1
+
+set -euo pipefail
+
+if [ "${EFA_SKIP_HOOKS:-0}" = "1" ]; then
+    echo "[pre-commit] EFA_SKIP_HOOKS=1，跳过检查"
+    exit 0
+fi
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+fail() { echo -e "${RED}[pre-commit] ✗ $1${NC}"; exit 1; }
+ok()   { echo -e "${GREEN}[pre-commit] ✓ $1${NC}"; }
+
+echo -e "${YELLOW}[pre-commit] 运行本地检查...${NC}"
+
+# 1. ruff check
+if uv run ruff check . > /dev/null 2>&1; then
+    ok "ruff check"
+else
+    uv run ruff check .
+    fail "ruff check 失败 → 运行 uv run ruff check --fix 修复"
+fi
+
+# 2. ruff format --check
+if uv run ruff format --check . > /dev/null 2>&1; then
+    ok "ruff format"
+else
+    uv run ruff format --check .
+    fail "ruff format 失败 → 运行 uv run ruff format . 修复"
+fi
+
+# 3. pytest
+if uv run pytest -q --tb=short > /dev/null 2>&1; then
+    ok "pytest"
+else
+    uv run pytest -q --tb=short
+    fail "pytest 失败"
+fi
+
+echo -e "${GREEN}[pre-commit] 所有检查通过 ✓${NC}"

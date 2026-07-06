@@ -1,0 +1,61 @@
+"""用户模型（自动生成）。
+
+项目侧真实 SQLAlchemy 模型，直接由生成项目注册。
+"""
+from __future__ import annotations
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Table, func
+from sqlalchemy.orm import DeclarativeBase, relationship
+
+from easy_fastapi.ext.orm.sqlalchemy.crud import SQLAlchemyCRUDMixin
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+# M2M 关联表
+user_role = Table(
+    "user_role",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("role.id"), primary_key=True),
+)
+
+
+class User(Base, SQLAlchemyCRUDMixin):
+    """认证用户表。"""
+
+    __tablename__ = "user"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(String(64), unique=True, nullable=True, index=True)
+    username = Column(String(32), unique=True, nullable=True, index=True)
+    hashed_password = Column(String(128), nullable=False)
+    token = Column(String(255), nullable=True)
+    avatar_url = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+
+    roles = relationship("Role", secondary=user_role, back_populates="users")
+
+    def __repr__(self) -> str:
+        return f"User(id={self.id}, username={self.username})"
+
+    @property
+    def identity(self) -> str:
+        return self.username or self.email
+
+    @property
+    def h_pwd(self) -> str:
+        return self.hashed_password
+
+    @property
+    def scopes(self) -> list[str]:
+        try:
+            return [role.role for role in self.roles]
+        except Exception:
+            return []
+
+
+__all__ = ["User", "Base", "user_role"]

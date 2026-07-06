@@ -1,0 +1,10 @@
+{
+  "name": "{{ options.package_name }}-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "sdk:gen": "pnpm --filter @{{ options.package_name }}/api-sdk sdk:gen"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

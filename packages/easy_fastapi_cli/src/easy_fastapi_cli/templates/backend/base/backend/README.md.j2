@@ -1,0 +1,33 @@
+{% if options.language == 'zh' %}
+# 后端
+
+{{ options.project_name }} 后端服务，基于 FastAPI。
+
+## 安装
+
+```bash
+uv sync
+```
+
+## 运行
+
+```bash
+efa run
+```
+{% else %}
+# Backend
+
+{{ options.project_name }} backend service, built with FastAPI.
+
+## Install
+
+```bash
+uv sync
+```
+
+## Run
+
+```bash
+efa run
+```
+{% endif %}

@@ -1,0 +1,41 @@
+"""用户路由（自动生成）。"""
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
+
+from easy_fastapi import BaseResult, _
+from app import schemas, services
+from app.extensions.auth import auth
+
+
+user_router = APIRouter()
+
+
+@user_router.get('', summary=_('Query User'), response_model=BaseResult[schemas.User])
+@auth.require
+async def get(id: int):
+    return await services.user.get(id)
+
+
+@user_router.post('', summary=_('Add User'), response_model=BaseResult[schemas.User])
+@auth.require
+async def add(user_data: schemas.UserCreate):
+    return await services.user.add(user_data)
+
+
+@user_router.put('', summary=_('Modify User'), response_model=BaseResult[schemas.User])
+@auth.require
+async def modify(user_data: schemas.UserModify):
+    return await services.user.modify(user_data)
+
+
+@user_router.delete('', summary=_('Delete User'), response_model=BaseResult[int])
+@auth.require
+async def delete(ids: list[int] = Query(...)):
+    return await services.user.delete(ids)
+
+
+@user_router.get('/page', summary=_('Query User list'), response_model=BaseResult[schemas.PageQueryOut[schemas.User]])
+@auth.require
+async def page(page_query: Annotated[schemas.PageQuery, Depends()]):
+    return await services.user.page(page_query)

@@ -1,0 +1,34 @@
+"""用户模型（自动生成）。
+
+项目侧真实 SQLModel 模型，直接由生成项目注册。
+"""
+from __future__ import annotations
+
+from sqlmodel import Field, SQLModel
+
+from easy_fastapi.ext.orm.sqlmodel.crud import SQLModelCRUDMixin
+
+
+class User(SQLModel, SQLModelCRUDMixin, table=True):
+    """认证用户表。"""
+
+    id: int | None = Field(default=None, primary_key=True)
+    email: str | None = Field(default=None, max_length=64, unique=True, index=True)
+    username: str | None = Field(default=None, max_length=32, unique=True, index=True)
+    hashed_password: str = Field(max_length=128)
+    is_active: bool = Field(default=True)
+
+    @property
+    def identity(self) -> str:
+        return self.username or self.email
+
+    @property
+    def h_pwd(self) -> str:
+        return self.hashed_password
+
+    @property
+    def scopes(self) -> list[str]:
+        return []
+
+
+__all__ = ["User"]

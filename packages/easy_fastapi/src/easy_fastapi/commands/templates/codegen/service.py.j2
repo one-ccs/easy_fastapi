@@ -1,0 +1,37 @@
+{# codegen/service.py.j2 — 由 generate_for_model 渲染，meta=ModelMeta, snake=str, pk_name/pk_type=主键 #}
+"""{{ meta.name }} service（自动生成）。"""
+from easy_fastapi import (
+    FailureException,
+    Result,
+)
+from app import schemas, models
+
+
+async def get({{ pk_name }}: {{ pk_type }}):
+    db = await models.{{ meta.name }}.by_id({{ pk_name }})
+    if not db:
+        raise FailureException('{{ meta.name }} not found')
+    return Result(data=db)
+
+
+async def add(data: schemas.{{ meta.name }}Create):
+    db = await models.{{ meta.name }}.create(**data.model_dump(exclude_unset=True))
+    return Result(data=db)
+
+
+async def modify(data: schemas.{{ meta.name }}Modify):
+    db = await models.{{ meta.name }}.by_id(data.{{ pk_name }})
+    if not db:
+        raise FailureException('{{ meta.name }} not found')
+    db = await models.{{ meta.name }}.update_from_dict(db, data.model_dump(exclude={'{{ pk_name }}'}, exclude_unset=True))
+    return Result(data=db)
+
+
+async def delete(ids: list[{{ pk_type }}]):
+    count = await models.{{ meta.name }}.delete_by_ids(ids)
+    return Result(data=count)
+
+
+async def page(page_query: schemas.PageQuery):
+    result = await models.{{ meta.name }}.paginate(page_query.page, page_query.size)
+    return Result(data=result)

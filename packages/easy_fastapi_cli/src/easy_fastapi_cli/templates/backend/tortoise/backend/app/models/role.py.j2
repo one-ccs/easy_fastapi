@@ -1,0 +1,24 @@
+"""角色模型（自动生成）。
+
+项目侧真实 Tortoise 模型，直接由生成项目注册。"""
+from __future__ import annotations
+
+from tortoise import Model, fields
+
+from easy_fastapi.ext.orm.tortoise.crud import ExtendedCRUD
+
+
+class Role(Model, ExtendedCRUD):  # type: ignore[misc, valid-type]
+    """角色表。"""
+
+    id = fields.IntField(primary_key=True, description="角色 id")
+    role = fields.CharField(max_length=16, unique=True, db_index=True, description="角色名称")
+    role_desc = fields.CharField(max_length=32, description="角色描述")
+
+    users: fields.ManyToManyRelation["User"]  # type: ignore
+
+    class Meta:
+        table = "role"
+
+
+__all__ = ["Role"]

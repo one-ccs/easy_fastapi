@@ -1,0 +1,101 @@
+{% if options.language == 'zh' %}
+# {{ options.project_name }}
+
+{% if options.frontend %}
+全栈 FastAPI 项目，前后端分离 monorepo。
+
+## 快速开始
+
+### 后端
+
+```bash
+cd backend
+uv sync
+{% if options.database %}efa db sync{% endif %}
+efa run
+```
+
+### 前端
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+### 生成 API SDK
+
+先启动后端，然后：
+
+```bash
+cd frontend
+pnpm sdk:gen
+```
+{% else %}
+FastAPI 后端项目。
+
+## 快速开始
+
+```bash
+uv sync
+{% if options.database %}efa db sync{% endif %}
+efa run
+```
+{% endif %}
+
+## 开发
+
+```bash
+efa run --reload
+```
+{% else %}
+# {{ options.project_name }}
+
+{% if options.frontend %}
+Full-stack FastAPI project with monorepo layout.
+
+## Quick Start
+
+### Backend
+
+```bash
+cd backend
+uv sync
+{% if options.database %}efa db sync{% endif %}
+efa run
+```
+
+### Frontend
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+### Generate API SDK
+
+Start the backend first, then:
+
+```bash
+cd frontend
+pnpm sdk:gen
+```
+{% else %}
+FastAPI backend project.
+
+## Quick Start
+
+```bash
+uv sync
+{% if options.database %}efa db sync{% endif %}
+efa run
+```
+{% endif %}
+
+## Development
+
+```bash
+efa run --reload
+```
+{% endif %}

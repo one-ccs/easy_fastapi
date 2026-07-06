@@ -1,0 +1,28 @@
+"""角色模型（自动生成）。
+
+项目侧真实 SQLAlchemy 模型，直接由生成项目注册。
+"""
+from __future__ import annotations
+
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+
+from .user import Base, SQLAlchemyCRUDMixin
+
+
+class Role(Base, SQLAlchemyCRUDMixin):
+    """角色表。"""
+
+    __tablename__ = "role"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    role = Column(String(16), unique=True, nullable=False, index=True)
+    role_desc = Column(String(32), nullable=False)
+
+    users = relationship("User", secondary="user_role", back_populates="roles")
+
+    def __repr__(self) -> str:
+        return f"Role(id={self.id}, role={self.role})"
+
+
+__all__ = ["Role"]

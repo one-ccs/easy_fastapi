@@ -1,0 +1,135 @@
+# Easy FastAPI 配置（自动生成）
+# ──────────────────────────────────────────────────────────────
+# fastapi 段：FastAPI 自身配置
+# easy_fastapi 段：框架 + 扩展配置
+#   扩展配置由对应扩展按需加载（loader.section("easy_fastapi.<name>")）；
+#   未启用的段可省略，extra='forbid' 校验键名拼写。
+# ──────────────────────────────────────────────────────────────
+
+fastapi:
+  # 应用根路径（反向代理子路径时设置，如 "/api"）
+  root_path: ""
+
+  swagger:
+    title: "{{ options.project_name }}"
+    description: "Easy FastAPI：一条命令生成 FastAPI 全栈项目：后端（3 ORM × 认证 × Redis × 静态挂载）+ 前端（最小 pnpm monorepo 骨架 + OpenAPI SDK 自动生成）。"
+    version: "0.1.0"
+    # OpenAPI token 端点（Swagger UI Authorize 弹窗用）
+    token_url: "/auth/token"
+    docs_url: "/docs"
+    redoc_url: "/redoc"
+    openapi_url: "/openapi.json"
+
+  middleware:
+    cors:
+      enabled: true
+      allow_origins: ["*"]
+      allow_methods: ["*"]
+      allow_headers: ["*"]
+      allow_credentials: true
+      # expose_headers: []
+      # max_age: 600
+    https_redirect:
+      enabled: false
+    trusted_host:
+      enabled: false
+      # allowed_hosts: ["*"]
+    gzip:
+      enabled: false
+      # minimum_size: 1000
+      # compress_level: 5
+
+easy_fastapi:
+  # ── 响应码策略 ──
+  # style: "http" → code = HTTP status（RESTful，默认）
+  # style: "zero_success" → 成功 code=0，错误 code 仍用 HTTP status
+  # trace_id: true → 错误响应自动附加 trace_id（便于追踪日志）
+  response_code:
+    style: "http"
+    trace_id: false
+
+  # ── 上传目录（null=不限制） ──
+  # upload_dir: "uploads"
+{% if options.static %}
+
+  # ── 静态文件托管 ──
+  static:
+    enabled: true
+    # 静态文件目录（相对于项目根目录/backend目录）
+    directory: "static"
+    # URL 挂载路径（必须以 / 开头）
+    url_path: "/static"
+{% endif %}
+{% if options.database %}
+
+  # ── 数据库配置（ORM 无关，各 ORM 扩展共用） ──
+  database:
+    # 方言：sqlite / mysql / postgres
+    dialect: "{{ options.db_dialect }}"
+{% if options.db_dialect == 'sqlite' %}
+    # SQLite 数据库文件路径（":memory:" = 内存数据库）
+    database: ":memory:"
+{% else %}
+    username: "root"
+    password: ""
+    database: "{{ options.package_name }}"
+    host: "localhost"
+    port: {{ 5432 if options.db_dialect == 'postgres' else 3306 }}
+{% endif %}
+    # 是否打印 SQL 语句（开发调试用）
+    # echo: false
+    # 时区
+    # timezone: "Asia/Shanghai"
+{% endif %}
+{% if options.auth %}
+
+  # ── 认证配置 ──
+  auth:
+    # JWT 签名密钥（生产环境务必更换为强随机字符串，≥32 字符）
+    secret: "easy-fastapi_change-me-in-production_should-be-greater-than-32-characters"
+    # JWT 签名算法
+    algorithm: "HS256"
+    # access_token 有效期（分钟）
+    access_expire_minutes: 1440
+    # refresh_token 有效期（天）
+    refresh_expire_days: 7
+    # 认证路由前缀
+    token_prefix: "/auth"
+    # 是否签发 refresh_token（false = access-only 模式，不注册 /auth/refresh）
+    enable_refresh: true
+    # refresh_token 传输方式：
+    #   "body"   → 请求头 Authorization: Bearer <token>（SPA / 移动端）
+    #   "cookie" → HttpOnly cookie（防 XSS 盗取，Web 应用推荐）
+    token_transport: "body"
+    # token_transport=cookie 时的 cookie 配置
+    cookie:
+      name: "refresh_token"
+      path: "/auth/refresh"
+      domain: ~
+      secure: false
+      httponly: true
+      samesite: "lax"
+    # scopes 匹配策略：
+    #   "any" = 交集 OR（用户有任一 required scope 即通过，默认）
+    #   "all" = 子集 AND（用户必须拥有全部 required scopes）
+    scope_match: "any"
+{% endif %}
+{% if options.redis %}
+
+  # ── Redis 配置 ──
+  redis:
+    # enabled=false 时回退到内存 persistence（MemoryPersistence）
+    enabled: false
+    url: "redis://localhost:6379/0"
+{% endif %}
+{% if options.i18n %}
+
+  # ── 国际化配置 ──
+  i18n:
+    # 默认语言（Accept-Language 不匹配或缺失时使用）
+    default_locale: "zh_CN"
+    # 可用语言列表（default_locale 必须在此列表中）
+    available_locales:
+      - "zh_CN"
+      - "en_US"
+{% endif %}

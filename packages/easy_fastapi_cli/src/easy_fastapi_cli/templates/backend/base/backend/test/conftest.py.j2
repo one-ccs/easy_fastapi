@@ -1,0 +1,27 @@
+"""测试 fixture（自动生成）。"""
+import pytest
+from fastapi.testclient import TestClient
+from app.main import app
+
+
+@pytest.fixture(scope='package')
+def client():
+    with TestClient(app) as c:
+        yield c
+
+
+@pytest.fixture(scope='package')
+def login_client(client: TestClient):
+    """登录后客户端（自动携带 token）。"""
+    # 先注册一个用户
+    client.post('/users/register', json={'username': 'testuser', 'password': '123456'})
+
+    # 登录获取 token（OAuth2 表单提交）
+    response = client.post(
+        '/auth/login',
+        data={'username': 'testuser', 'password': '123456'},
+    )
+    access_token = response.json()['data']['access_token']
+    headers = {'Authorization': f'Bearer {access_token}'}
+    client.headers.update(headers)
+    yield client

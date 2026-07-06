@@ -1,0 +1,43 @@
+{#- codegen/schema.py.j2 — 由 generate_for_model 渲染，meta=ModelMeta, type_map=dict, snake=str,
+   pk_name/pk_type=主键信息, needs_*=条件 import -#}
+"""{{ meta.name }} schemas（自动生成）。"""
+{% if needs_datetime or needs_date or needs_time %}
+from datetime import {{ "datetime" if needs_datetime }}{{ ", " if needs_datetime and (needs_date or needs_time) }}{{ "date" if needs_date }}{{ ", " if needs_date and needs_time }}{{ "time" if needs_time }}
+{% endif %}
+{% if needs_decimal %}
+from decimal import Decimal
+{% endif %}
+{% if needs_uuid %}
+from uuid import UUID
+{% endif %}
+from pydantic import BaseModel
+
+
+class {{ meta.name }}Base(BaseModel):
+{% set ns = namespace(has_fields=False) %}
+{% for f in meta.fields %}
+{% if not f.primary_key and not f.relation %}
+    {{ f.name }}: {{ type_map.get(f.type_name, 'str') }}{{ " | None = None" if f.nullable }}
+{% set ns.has_fields = True %}
+{% endif %}
+{% endfor %}
+{% if not ns.has_fields %}
+    pass
+{% endif %}
+
+class {{ meta.name }}({{ meta.name }}Base):
+{% set ns2 = namespace(has_pk=False) %}
+{% for f in meta.fields %}
+{% if f.primary_key %}
+    {{ f.name }}: {{ type_map.get(f.type_name, 'str') }}
+{% set ns2.has_pk = True %}
+{% endif %}
+{% endfor %}
+{% if not ns2.has_pk %}
+    pass
+{% endif %}
+
+class {{ meta.name }}Create({{ meta.name }}Base): ...
+
+class {{ meta.name }}Modify({{ meta.name }}Base):
+    {{ pk_name }}: {{ pk_type }}

@@ -1,11 +1,19 @@
-.vscode/
-.vscodecounter/
+# Python-generated files
 __pycache__/
+*.py[oc]
 build/
 dist/
-release/
-*.egg-info/
-migrations/
+wheels/
+*.egg-info
 
+# Virtual environments
+.venv
+
+# Custom
+.vscode/*
+release/
 *.log*
 *.local
+
+# gettext compiled catalogs (generated from .po at build time)
+*.mo

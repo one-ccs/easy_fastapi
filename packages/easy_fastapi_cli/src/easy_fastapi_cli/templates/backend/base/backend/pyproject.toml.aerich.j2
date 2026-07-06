@@ -1,0 +1,6 @@
+{# aerich 配置段——供 aerich CLI 使用。
+   框架的 efa db 命令通过 aerich_impl 内部构造 config dict，不依赖此配置。
+   若需手动使用 aerich CLI，需创建 app/core/db_config.py 暴露 TORTOISE_ORM 配置 dict，
+   或直接使用 efa db 命令代替。 #}
+[aerich]
+tortoise_orm = "app.core.db_config.TORTOISE_ORM"

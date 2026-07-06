@@ -1,0 +1,19 @@
+"""角色 schemas（自动生成）。"""
+from pydantic import BaseModel
+
+
+class RoleBase(BaseModel):
+    role: str
+    role_desc: str
+
+
+class Role(RoleBase): ...
+
+
+class RoleCreate(RoleBase): ...
+
+
+class RoleModify(BaseModel):
+    id: int
+    role: str | None = None
+    role_desc: str | None = None

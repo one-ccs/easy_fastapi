@@ -1,0 +1,20 @@
+"""角色模型（自动生成）。
+
+项目侧真实 SQLModel 模型，直接由生成项目注册。
+"""
+from __future__ import annotations
+
+from sqlmodel import Field, SQLModel
+
+from easy_fastapi.ext.orm.sqlmodel.crud import SQLModelCRUDMixin
+
+
+class Role(SQLModel, SQLModelCRUDMixin, table=True):
+    """角色表。"""
+
+    id: int | None = Field(default=None, primary_key=True)
+    role: str = Field(max_length=16, unique=True, index=True)
+    role_desc: str = Field(max_length=32)
+
+
+__all__ = ["Role"]

@@ -1,0 +1,41 @@
+"""角色路由（自动生成）。"""
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
+
+from easy_fastapi import BaseResult, _
+from app import schemas, services
+from app.extensions.auth import auth
+
+
+role_router = APIRouter()
+
+
+@role_router.get('', summary=_('Query Role'), response_model=BaseResult[schemas.Role])
+@auth.require
+async def get(id: int):
+    return await services.role.get(id)
+
+
+@role_router.post('', summary=_('Add Role'), response_model=BaseResult[schemas.Role])
+@auth.require
+async def add(role_data: schemas.RoleCreate):
+    return await services.role.add(role_data)
+
+
+@role_router.put('', summary=_('Modify Role'), response_model=BaseResult[schemas.Role])
+@auth.require
+async def modify(role_data: schemas.RoleModify):
+    return await services.role.modify(role_data)
+
+
+@role_router.delete('', summary=_('Delete Role'), response_model=BaseResult[int])
+@auth.require
+async def delete(ids: list[int] = Query(...)):
+    return await services.role.delete(ids)
+
+
+@role_router.get('/page', summary=_('Query Role list'), response_model=BaseResult[schemas.PageQueryOut[schemas.Role]])
+@auth.require
+async def page(page_query: Annotated[schemas.PageQuery, Depends()]):
+    return await services.role.page(page_query)

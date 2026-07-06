@@ -1,0 +1,36 @@
+"""认证业务路由（自动生成）。
+
+auth 扩展已注册 /auth/login、/auth/refresh、/auth/logout、/auth/me（核心认证流程）。
+本模块补充项目侧业务接口：注册用户。
+"""
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel, ConfigDict
+
+from app.handlers.auth_handler import create_user
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
+    username: str | None = None
+    is_active: bool = True
+
+
+class RegisterRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    username: str
+    password: str
+
+
+@router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+async def register(body: RegisterRequest):
+    """注册用户（开放接口，无认证）。"""
+    try:
+        user = await create_user(body.username, body.password)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
+    return user

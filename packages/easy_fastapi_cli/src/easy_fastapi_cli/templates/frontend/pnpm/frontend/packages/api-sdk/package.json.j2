@@ -1,0 +1,17 @@
+{
+  "name": "@{{ options.package_name }}/api-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "sdk:gen": "openapi-ts"
+  },
+  "dependencies": {
+    "@hey-api/client-fetch": "^0.13.0"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.99.0",
+    "typescript": "^5.6.0"
+  }
+}

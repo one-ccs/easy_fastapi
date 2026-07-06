@@ -1,0 +1,50 @@
+[tool.uv.workspace]
+members = ["packages/easy_fastapi", "packages/easy_fastapi_cli"]
+
+[tool.uv.sources]
+easy_fastapi = { workspace = true }
+easy_fastapi_cli = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.0",
+    "tortoise-orm>=0.21.7",
+    "sqlalchemy>=2.0.0",
+    "sqlmodel>=0.0.21",
+    "aerich>=0.8.0",
+    "alembic>=1.13.0",
+    "pyjwt>=2.9.0",
+    "pwdlib[argon2]>=0.2.0",
+    "bcrypt>=4.0.0",
+    "redis>=5.2.0",
+    "aiosqlite>=0.20.0",
+    "asyncmy>=0.2.9",
+    "asyncpg>=0.29.0",
+    # CLI 工具链（供测试 import，与 CLI 包依赖对齐）
+    "uvicorn>=0.30.0",
+    "typer>=0.12.0",
+    "questionary>=2.0.0",
+    "rich>=13.0.0",
+    "jinja2>=3.1.0",
+    "pyyaml>=6.0",
+    "tomli>=2.0.0; python_version<'3.11'",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.20",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+norecursedirs = ["packages/easy_fastapi_cli/src/easy_fastapi_cli/templates"]
+markers = [
+    "optional: 需要外部工具（pnpm/node），CI 可跳过",
+]
+
+[tool.ruff]
+line-length = 120
+exclude = ["packages/easy_fastapi_cli/src/easy_fastapi_cli/templates"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]

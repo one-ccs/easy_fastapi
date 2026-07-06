@@ -1,0 +1,139 @@
+# Chinese (Simplified) translations for easy_fastapi.
+# Copyright (C) 2026 easy_fastapi
+# This file is distributed under the same license as the easy_fastapi project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: easy_fastapi 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-05 00:00+0800\n"
+"PO-Revision-Date: 2026-07-05 00:00+0800\n"
+"Last-Translator: \n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# ── 通用响应消息 ──
+
+msgid "Request succeeded"
+msgstr "请求成功"
+
+msgid "Request failed"
+msgstr "请求失败"
+
+msgid "Please login first"
+msgstr "请登录后操作"
+
+msgid "Permission denied"
+msgstr "您无权进行此操作"
+
+msgid "Resource not found"
+msgstr "未找到请求的资源"
+
+msgid "Method not allowed"
+msgstr "不允许的请求方法"
+
+msgid "Bad request"
+msgstr "请求参数有误"
+
+msgid "Internal server error"
+msgstr "服务器错误，请联系管理员"
+
+# ── Auth 扩展 ──
+
+msgid "User not found or disabled"
+msgstr "用户不存在或已禁用"
+
+msgid "Missing authentication credentials"
+msgstr "缺少认证凭据"
+
+msgid "Invalid access token"
+msgstr "无效的访问令牌"
+
+msgid "Token has been revoked"
+msgstr "令牌已被吊销"
+
+msgid "Token missing user identity"
+msgstr "令牌缺少用户标识"
+
+msgid "Invalid token user identity"
+msgstr "令牌用户标识无效"
+
+msgid "Token has expired"
+msgstr "令牌已过期"
+
+msgid "Invalid signature"
+msgstr "无效的签名"
+
+msgid "Token decode failed"
+msgstr "令牌解析失败"
+
+msgid "Unknown token error"
+msgstr "未知令牌错误"
+
+msgid "Invalid username or password"
+msgstr "用户名或密码错误"
+
+msgid "User is disabled"
+msgstr "用户已被禁用"
+
+msgid "Login successful"
+msgstr "登录成功"
+
+msgid "Invalid refresh token"
+msgstr "无效的刷新令牌"
+
+msgid "Refresh token has been revoked"
+msgstr "刷新令牌已被吊销"
+
+msgid "Missing refresh token"
+msgstr "缺少刷新令牌"
+
+msgid "Token refreshed"
+msgstr "刷新令牌成功"
+
+# ── Codegen 模板消息 ──
+# 注意：gettext 是精确匹配，不支持 {name} 模板替换。
+# auth 扩展自带的 User/Role 路由 summary 在此预填翻译；
+# 新增模型时请在项目 locales/ 下添加对应条目。
+
+msgid "User"
+msgstr "用户"
+
+msgid "Query User"
+msgstr "查询用户"
+
+msgid "Add User"
+msgstr "添加用户"
+
+msgid "Modify User"
+msgstr "修改用户"
+
+msgid "Delete User"
+msgstr "删除用户"
+
+msgid "Query User list"
+msgstr "获取用户列表"
+
+msgid "Role"
+msgstr "角色"
+
+msgid "Query Role"
+msgstr "查询角色"
+
+msgid "Add Role"
+msgstr "添加角色"
+
+msgid "Modify Role"
+msgstr "修改角色"
+
+msgid "Delete Role"
+msgstr "删除角色"
+
+msgid "Query Role list"
+msgstr "获取角色列表"
+
+msgid "{name} not found"
+msgstr "{name}不存在"

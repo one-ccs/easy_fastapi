@@ -1,0 +1,48 @@
+[project]
+name = "easy_fastapi_cli"
+version = "1.0.0"
+description = "Easy FastAPI 脚手架 CLI：一键生成可选前端/数据库/ORM/迁移/认证/Redis 的 FastAPI 项目。"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "one-ccs", email = "one-ccs@foxmal.com"}]
+keywords = ["fastapi", "scaffold", "cli", "tortoise", "sqlalchemy", "sqlmodel", "openapi"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "easy_fastapi>=1.0.0",
+    "uvicorn>=0.30.0",
+    "typer>=0.12.0",
+    "questionary>=2.0.0",
+    "rich>=13.0.0",
+    "jinja2>=3.1.0",
+    "pyyaml>=6.0",
+    "tomli>=2.0.0; python_version<'3.11'",
+]
+
+[project.scripts]
+efa = "easy_fastapi_cli.main:app"
+easy-fastapi = "easy_fastapi_cli.main:app"
+
+[project.urls]
+Homepage = "https://github.com/one-ccs/easy_fastapi"
+Documentation = "https://github.com/one-ccs/easy_fastapi/docs"
+Issues = "https://github.com/one-ccs/easy_fastapi/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/easy_fastapi_cli"]

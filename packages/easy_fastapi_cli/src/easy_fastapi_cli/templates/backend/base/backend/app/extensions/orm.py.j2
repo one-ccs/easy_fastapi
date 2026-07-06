@@ -1,0 +1,16 @@
+"""ORM 扩展实例。"""
+from app.models.user import User
+from app.models.role import Role
+{% if options.orm == 'tortoise' %}
+from easy_fastapi.ext.orm.tortoise.extension import TortoiseExtension
+
+orm = TortoiseExtension(models=[User, Role])
+{% elif options.orm == 'sqlalchemy' %}
+from easy_fastapi.ext.orm.sqlalchemy.extension import SQLAlchemyExtension
+
+orm = SQLAlchemyExtension(models=[User, Role])
+{% elif options.orm == 'sqlmodel' %}
+from easy_fastapi.ext.orm.sqlmodel.extension import SQLModelExtension
+
+orm = SQLModelExtension(models=[User, Role])
+{% endif %}

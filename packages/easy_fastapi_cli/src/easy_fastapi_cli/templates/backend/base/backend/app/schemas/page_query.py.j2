@@ -1,0 +1,24 @@
+"""分页查询 schemas（自动生成）。"""
+from typing import Generic, TypeVar
+from dataclasses import dataclass
+
+from fastapi import Query
+from pydantic import BaseModel
+
+
+_T = TypeVar('_T')
+
+
+@dataclass
+class PageQuery:
+    """分页查询参数"""
+    page: int = Query(1)
+    size: int = Query(10)
+    query: str = Query('')
+
+
+class PageQueryOut(BaseModel, Generic[_T]):
+    """分页查询结果"""
+    total: int
+    items: list[_T]
+    finished: bool

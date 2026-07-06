@@ -1,0 +1,58 @@
+"""用户 service（自动生成）。"""
+from easy_fastapi import (
+    FailureException,
+    Result,
+)
+from easy_fastapi.ext.auth.hasher import PwdlibPasswordHasher
+from app import schemas, models
+
+_hasher = PwdlibPasswordHasher()
+
+
+async def get(id: int):
+    db_user = await models.User.by_id(id, ('roles',))
+    if not db_user:
+        raise FailureException('User not found')
+    return Result(data=db_user)
+
+
+async def add(user: schemas.UserCreate):
+    if not user.username and not user.email:
+        raise FailureException('Username and email cannot both be empty')
+
+    if user.username and await models.User.exists(username=user.username):
+        raise FailureException('Username already exists')
+
+    if user.email and await models.User.exists_by_email(user.email):
+        raise FailureException('Email already exists')
+
+    db_user = await models.User.create(
+        username=user.username,
+        email=user.email,
+        hashed_password=_hasher.hash(user.password),
+    )
+    return Result(data=db_user)
+
+
+async def modify(user: schemas.UserModify):
+    db_user = await models.User.by_id(user.id)
+    if not db_user:
+        raise FailureException('User not found')
+
+    update_data = user.model_dump(exclude={'id'}, exclude_unset=True)
+    password = update_data.pop('password', None)
+    if password:
+        update_data['hashed_password'] = _hasher.hash(password)
+
+    db_user = await models.User.update_from_dict(db_user, update_data)
+    return Result(data=db_user)
+
+
+async def delete(ids: list[int]):
+    count = await models.User.delete_by_ids(ids)
+    return Result(data=count)
+
+
+async def page(page_query: schemas.PageQuery):
+    result = await models.User.paginate(page_query.page, page_query.size, prefetch=('roles',))
+    return Result(data=result)

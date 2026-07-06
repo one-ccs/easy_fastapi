@@ -1,0 +1,18 @@
+"""认证处理器（自动生成）。
+
+项目侧认证业务逻辑（注册用户、修改密码等）。
+auth 扩展已通过 ctx provide 了 user_model / token_service / require。
+"""
+from easy_fastapi.ext.auth.hasher import PwdlibPasswordHasher
+from app.models import User
+
+_hasher = PwdlibPasswordHasher()
+
+
+async def create_user(username: str, password: str, **extra) -> dict:
+    """创建用户（明文密码经哈希后入库）。"""
+    if await User.exists(username=username):
+        raise ValueError(f"用户 '{username}' 已存在")
+    hashed = _hasher.hash(password)
+    user = await User.create_user(username, hashed, **extra)
+    return {"id": getattr(user, "id", None), "username": getattr(user, "username", None)}

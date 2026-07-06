@@ -1,0 +1,24 @@
+"""路由注册（自动生成）。"""
+from fastapi import FastAPI
+from easy_fastapi import _
+
+
+def register_routers(app: FastAPI) -> None:
+    """挂载业务路由。"""
+{% if options.auth %}
+    from app.routers.auth import router as auth_router
+    from app.routers.user import user_router
+    from app.routers.role import role_router
+
+    app.include_router(auth_router)
+    app.include_router(user_router, prefix="/user", tags=[_("User")])
+    app.include_router(role_router, prefix="/role", tags=[_("Role")])
+{% endif %}
+
+
+def register_health(app: FastAPI) -> None:
+    """健康检查端点。"""
+
+    @app.get("/health", tags=["infra"])
+    async def health():
+        return {"status": "ok"}

@@ -1,0 +1,55 @@
+"""应用工厂（自动生成）。"""
+from fastapi import FastAPI
+
+from easy_fastapi import EasyFastAPI
+{% if options.database %}
+from app.extensions.orm import orm
+{% endif %}
+{% if options.auth %}
+from app.extensions.auth import auth
+{% endif %}
+{% if options.redis %}
+from app.extensions.redis import redis
+{% endif %}
+{% if options.static %}
+from app.extensions.static import static
+{% endif %}
+{% if options.i18n %}
+from app.extensions.i18n import i18n
+{% endif %}
+
+from app.middlewares import register_middlewares
+from app.bootstrap.routers import register_routers, register_health
+
+
+def create_app() -> FastAPI:
+    """创建并装配 FastAPI 应用。"""
+    app = FastAPI()
+    efa = EasyFastAPI(app)
+    (
+        efa
+{% if options.database %}
+        .use(orm)
+{% endif %}
+{% if options.auth %}
+        .use(auth)
+{% endif %}
+{% if options.redis %}
+        .use(redis)
+{% endif %}
+{% if options.static %}
+        .use(static)
+{% endif %}
+{% if options.i18n %}
+        .use(i18n)
+{% endif %}
+    )
+
+    # 注册中间件（根据 easy-fastapi.yaml 配置）
+    register_middlewares(app)
+
+    # 挂载业务路由 + 健康检查
+    register_routers(app)
+    register_health(app)
+
+    return app

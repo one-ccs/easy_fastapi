@@ -1,0 +1,39 @@
+{% if options.language == "zh" %}
+# @{{ options.package_name }}/api-sdk
+
+由后端 OpenAPI 自动生成的客户端 SDK。
+
+## 生成方式
+
+1. 先启动后端服务（提供 `openapi.json`）
+2. 在本包目录执行：
+
+```bash
+pnpm sdk:gen
+```
+
+## 注意
+
+- 生成代码位于 `src/`，**不建议手动修改**（会被覆盖）
+- 用户前端应用应通过 workspace 依赖引用本包，调用其中导出的接口
+- 后端接口变更后重新执行 `sdk:gen` 即可同步
+{% else %}
+# @{{ options.package_name }}/api-sdk
+
+Auto-generated client SDK from the backend OpenAPI spec.
+
+## Generation
+
+1. Start the backend first (serves `openapi.json`)
+2. Run in this package:
+
+```bash
+pnpm sdk:gen
+```
+
+## Notes
+
+- Generated code lives in `src/` — **do not edit manually** (it will be overwritten)
+- Frontend apps should depend on this package via workspace and call its exported APIs
+- Re-run `sdk:gen` after backend API changes to sync
+{% endif %}

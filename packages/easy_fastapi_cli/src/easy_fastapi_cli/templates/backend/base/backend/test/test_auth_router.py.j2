@@ -1,0 +1,19 @@
+"""认证路由测试（自动生成）。"""
+from fastapi.testclient import TestClient
+
+
+def test_login_success(client: TestClient):
+    response = client.post(
+        '/auth/login',
+        data={'username': 'testuser', 'password': '123456'},
+    )
+    assert response.status_code == 200
+    assert 'access_token' in response.json()['data']
+
+
+def test_login_failed(client: TestClient):
+    response = client.post(
+        '/auth/login',
+        data={'username': 'testuser', 'password': 'wrong'},
+    )
+    assert response.status_code == 401

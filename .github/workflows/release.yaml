@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      UV_INDEX_URL: https://pypi.org/simple
+    permissions:
+      contents: write
+      id-token: write  # PyPI Trusted Publisher (OIDC)
+
+    environment: release
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run tests
+        run: uv run pytest --tb=short -q
+
+      - name: Build easy_fastapi
+        run: uv build packages/easy_fastapi --out-dir dist
+
+      - name: Build easy_fastapi_cli
+        run: uv build packages/easy_fastapi_cli --out-dir dist
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-packages
+          path: dist/*
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          name: ${{ github.ref_name }}
+          generate_release_notes: true

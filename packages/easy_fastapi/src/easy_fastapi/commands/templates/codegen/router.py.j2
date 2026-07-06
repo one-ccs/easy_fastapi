@@ -1,0 +1,42 @@
+{# codegen/router.py.j2 — 由 generate_for_model 渲染，meta=ModelMeta, snake=str, pk_name/pk_type=主键 #}
+"""{{ meta.name }} 路由（自动生成）。"""
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
+
+from easy_fastapi import BaseResult, _
+from app import schemas, services
+from app.extensions.auth import auth
+
+
+{{ snake }}_router = APIRouter()
+
+
+@{{ snake }}_router.get('', summary=_('Query {{ meta.name }}'), response_model=BaseResult[schemas.{{ meta.name }}])
+@auth.require
+async def get({{ pk_name }}: {{ pk_type }}):
+    return await services.{{ snake }}.get({{ pk_name }})
+
+
+@{{ snake }}_router.post('', summary=_('Add {{ meta.name }}'), response_model=BaseResult[schemas.{{ meta.name }}])
+@auth.require
+async def add(data: schemas.{{ meta.name }}Create):
+    return await services.{{ snake }}.add(data)
+
+
+@{{ snake }}_router.put('', summary=_('Modify {{ meta.name }}'), response_model=BaseResult[schemas.{{ meta.name }}])
+@auth.require
+async def modify(data: schemas.{{ meta.name }}Modify):
+    return await services.{{ snake }}.modify(data)
+
+
+@{{ snake }}_router.delete('', summary=_('Delete {{ meta.name }}'), response_model=BaseResult[int])
+@auth.require
+async def delete(ids: list[{{ pk_type }}] = Query(...)):
+    return await services.{{ snake }}.delete(ids)
+
+
+@{{ snake }}_router.get('/page', summary=_('Query {{ meta.name }} list'), response_model=BaseResult[schemas.PageQueryOut[schemas.{{ meta.name }}]])
+@auth.require
+async def page(page_query: Annotated[schemas.PageQuery, Depends()]):
+    return await services.{{ snake }}.page(page_query)
