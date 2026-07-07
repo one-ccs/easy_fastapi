@@ -1,7 +1,7 @@
 [project]
 name = "easy_fastapi_cli"
 version = "1.0.0"
-description = "Easy FastAPI 脚手架 CLI：一键生成可选前端/数据库/ORM/迁移/认证/Redis 的 FastAPI 项目。"
+description = "CLI to scaffold FastAPI projects — pick your ORM, auth, Redis, frontend in one command."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

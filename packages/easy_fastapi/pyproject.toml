@@ -1,7 +1,7 @@
 [project]
 name = "easy_fastapi"
 version = "1.0.0"
-description = "Easy FastAPI 运行时库：扩展化 FastAPI 框架 + ORM/auth/redis/migration 扩展。"
+description = "Extensible FastAPI framework with pluggable ORM, auth, Redis, i18n and static extensions."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
